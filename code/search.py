@@ -2,9 +2,11 @@ import tkinter as tk
 from tkinter import *
 import tkinter.ttk
 import sys
+import sql_utils
 
-def addButton():
+def addButton(connection):
     print(f"from other file...")
+    sql_utils.createRecipe(connection, )
     return None
 
 def main():

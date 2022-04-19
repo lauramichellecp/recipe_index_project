@@ -1,20 +1,15 @@
 import pymysql
 import search
+import sql_utils
 '''
 Retrieving information for users: login, signup, logout
 '''
 
-def login(email, password):
+def login(connection, email, password):
     '''
     Logs in as a user (checks if the given email and password exist in the database)
     '''
-    print(f"The email entered was {email} ")
-    print(f"The password entered was {password} ") 
-    successfulLogin = True
-    if (successfulLogin):
-        search.main()
-    else:
-        return -1
+    return 0
 
     # if user does not exist, create an alert or something
 
