@@ -134,7 +134,7 @@ DELIMITER ;
 
 -- return recipes with a total time less than the given
 DELIMITER $$
-DROP PROCEDURE IF EXISTS getRecipesByCookTime$$
+DROP PROCEDURE IF EXISTS getRecipesByTotalTime$$
 
 CREATE PROCEDURE getRecipesByTotalTime(IN time_max INT) 
 BEGIN
@@ -157,8 +157,9 @@ DELIMITER ;
 -- add to python code - add dietary restriction to all ing
 -- we couldnt do a function returning sql_msg 
 
-DROP PROCEDURE IF EXISTS createRecipe$$
 DELIMITER $$
+DROP PROCEDURE IF EXISTS createRecipe$$
+
 CREATE PROCEDURE createRecipe(r_name VARCHAR(64),
 								r_prep_time INT,
 								r_cook_time INT,
@@ -215,14 +216,14 @@ CALL createRecipe('No-Bake Chocolate Strawberry Coconut Bars', 20, 10, 8, 'Ameri
 
 SELECT * FROM recipe;
 
-CALL addIngredients(1, 'salt and pepper', 1, 'a pinch');
-CALL addIngredients(1, 'salt and pepper', 2, 'a pinch');
-
 SELECT * FROM ingredient;
 SELECT * FROM ingredient_follows;
 SELECT * FROM recipe_ingredient;
 
+
 DELIMITER $$
+DROP PROCEDURE IF EXISTS addIngredients$$
+
 CREATE PROCEDURE addIngredients(recipe_id INT, 
 								ingredient VARCHAR(16),
                                 diet_rest INT,
@@ -256,9 +257,14 @@ BEGIN
 END$$
 DELIMITER ;
 
+CALL addIngredients(1, 'salt and pepper', 1, 'a pinch');
+CALL addIngredients(1, 'salt and pepper', 2, 'a pinch');
+
 -- create a user 
 
 DELIMITER $$
+DROP PROCEDURE IF EXISTS createUser$$
+
 CREATE PROCEDURE createUser (user_first_name VARCHAR(16), 
 							user_last_name VARCHAR(16),
 							user_email VARCHAR(32),
@@ -280,6 +286,8 @@ SELECT * FROM user;
 -- create bookmark for a user 
 
 DELIMITER $$
+DROP PROCEDURE IF EXISTS createBookmark$$
+
 CREATE PROCEDURE createBookmark(recipe_id INT, user_id INT)
 BEGIN 
 	IF NOT
@@ -297,6 +305,8 @@ CALL getBookmarksByUser(1);
 -- get recipe by name 
 
 DELIMITER $$
+DROP PROCEDURE IF EXISTS getRecipeByName$$
+
 CREATE PROCEDURE getRecipeByName(rname VARCHAR(64))
 BEGIN
 	SELECT * FROM recipe WHERE recipe_name = rname;
@@ -316,12 +326,13 @@ CREATE TRIGGER recipe_ingredient_trigger
   
   -- trigger to delete the bookmarks links if deleted recipe
 DELIMITER $$
+DROP TRIGGER IF EXISTS bookmarks_trigger$$
 CREATE TRIGGER bookmarks_trigger
 	AFTER DELETE ON recipe
 	FOR EACH ROW 
   BEGIN
-    DELETE FROM bookmarks 
-    WHERE rid = old.rid;
+    DELETE FROM bookmark
+    WHERE recipe = old.rid;
   END$$
 
 /**
@@ -369,20 +380,3 @@ Also provide additional constraints on fields that are not part of the key
 
 3). add more procedures and triggers
 **/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
