@@ -108,11 +108,12 @@ SELECT * FROM ingredient_follows;
 SELECT * FROM dietary_restriction;
 
 SELECT * FROM user;
+
 SELECT * FROM bookmark;
 
 INSERT INTO bookmark VALUES(1, 4);
 INSERT INTO bookmark VALUES(3, 4);
 
 DELETE FROM recipe WHERE rid = 4 AND recipe_name = 'Spinach and Bacon Quiche';
-
+ 
 SELECT * FROM bookmark;

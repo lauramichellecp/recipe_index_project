@@ -261,7 +261,6 @@ CALL addIngredients(1, 'salt and pepper', 1, 'a pinch');
 CALL addIngredients(1, 'salt and pepper', 2, 'a pinch');
 
 -- create a user 
-
 DELIMITER $$
 DROP PROCEDURE IF EXISTS createUser$$
 
@@ -279,7 +278,7 @@ BEGIN
 END$$
 DELIMITER ;
 
-CALL createUser('first', 'last', 'email@something.com', 'pass');
+CALL createUser('first1', 'last1', 'email@something.com1', 'pass1');
 
 SELECT * FROM user;
 
@@ -309,10 +308,9 @@ DROP PROCEDURE IF EXISTS getRecipeByName$$
 
 CREATE PROCEDURE getRecipeByName(rname VARCHAR(64))
 BEGIN
-	SELECT * FROM recipe WHERE recipe_name = rname;
+	SELECT * FROM recipe WHERE recipe_name LIKE concat("%",rname,"%");
 END$$
 DELIMITER ;
-
 
 -- trigger to delete the ingredient to recipe links
 DELIMITER $$

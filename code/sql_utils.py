@@ -1,10 +1,7 @@
 import pymysql
 import sys
 
-_connection = None
-
-
-def createRecipe(r_name, r_prep_time, r_cook_time, r_serving_size,
+def createRecipe(_connection, r_name, r_prep_time, r_cook_time, r_serving_size,
                  r_cuisine, r_instruct, r_note, r_descrip, current_user, r_course):
     """
     Create a new recipe (add arguments needed for procedure call)
@@ -22,7 +19,7 @@ def createRecipe(r_name, r_prep_time, r_cook_time, r_serving_size,
     return True
 
 
-def createBookmark(r_id, current_user):
+def createBookmark(_connection, r_id, current_user):
     try:
         cursor = _connection.cursor()
         query = "CALL createBookmark('{0}', {1});".format(r_id, current_user)
@@ -34,7 +31,7 @@ def createBookmark(r_id, current_user):
     return True
 
 
-def createUser(u_first, u_last, u_email, u_pass):
+def createUser(_connection, u_first, u_last, u_email, u_pass):
     try:
         cursor = _connection.cursor()
         query = "CALL createUser('{0}', '{1}', '{2}', '{3}');".format(u_first, u_last, u_email, u_pass)
@@ -46,7 +43,7 @@ def createUser(u_first, u_last, u_email, u_pass):
     return True
 
 
-def getRecipeByName(r_name):
+def getRecipeByName(_connection, r_name):
     try:
         cursor = _connection.cursor()
         query = "CALL getRecipeByName('{0}')".format(r_name)
@@ -60,7 +57,7 @@ def getRecipeByName(r_name):
         return False
 
 
-def getRecipeAuthor(r_id):
+def getRecipeAuthor(_connection, r_id):
     try:
         cursor = _connection.cursor()
         query = "SELECT getRecipeAuthor({0});".format(r_id)
@@ -74,7 +71,7 @@ def getRecipeAuthor(r_id):
         return False
 
 
-def isRecipeAuthor(r_id, author_id):
+def isRecipeAuthor(_connection, r_id, author_id):
     try:
         cursor = _connection.cursor()
         query = "SELECT isRecipeAuthor({0}, {1});".format(r_id, author_id)
@@ -88,7 +85,7 @@ def isRecipeAuthor(r_id, author_id):
         return False
 
 
-def getRecipesByAuthor(author_id):
+def getRecipesByAuthor(_connection, author_id):
     try:
         cursor = _connection.cursor()
         query = "CALL getRecipesByAuthor({0});".format(author_id)
@@ -102,13 +99,12 @@ def getRecipesByAuthor(author_id):
         return False
 
 
-def getRecipeByID(r_id):
+def getRecipeByID(_connection, r_id):
     try:
         cursor = _connection.cursor()
         query = "CALL getRecipeByID({0});".format(r_id)
         cursor.execute(query)
         result = cursor.fetchone()
-
         return result
 
     except pymysql.Error as e:
@@ -116,13 +112,12 @@ def getRecipeByID(r_id):
         return False
 
 
-def getRecipesByCourse(course):
+def getRecipesByCourse(_connection, course):
     try:
         cursor = _connection.cursor()
         query = "CALL getRecipesByCourse('{0}');".format(course)
         cursor.execute(query)
         result = cursor.fetchall()
-
         return result
 
     except pymysql.Error as e:
@@ -130,7 +125,7 @@ def getRecipesByCourse(course):
         return False
 
 
-def getRecipesByPrepTime(prep_time_max):
+def getRecipesByPrepTime(_connection, prep_time_max):
     try:
         cursor = _connection.cursor()
         query = "CALL getRecipesByPrepTime({0});".format(prep_time_max)
@@ -144,13 +139,12 @@ def getRecipesByPrepTime(prep_time_max):
         return False
 
 
-def getRecipesByCookTime(cook_time_max):
+def getRecipesByCookTime(_connection, cook_time_max):
     try:
         cursor = _connection.cursor()
         query = "CALL getRecipesByCookTime({0});".format(cook_time_max)
         cursor.execute(query)
         result = cursor.fetchall()
-
         return result
 
     except pymysql.Error as e:
@@ -158,13 +152,12 @@ def getRecipesByCookTime(cook_time_max):
         return False
 
 
-def getRecipesByTotalTime(time_max):
+def getRecipesByTotalTime(_connection, time_max):
     try:
         cursor = _connection.cursor()
         query = "CALL getRecipesByTotalTime({0});".format(time_max)
         cursor.execute(query)
         result = cursor.fetchall()
-
         return result
 
     except pymysql.Error as e:
@@ -172,7 +165,7 @@ def getRecipesByTotalTime(time_max):
         return False
 
 
-def getBookmarkByUser(current_user):
+def getBookmarkByUser(_connection, current_user):
     try:
         cursor = _connection.cursor()
         query = "CALL getBookmarkByUser({0});".format(current_user)
@@ -186,7 +179,7 @@ def getBookmarkByUser(current_user):
         return False
 
 
-def getRecipeByName(r_name):
+def getRecipeByName(_connection, r_name):
     try:
         cursor = _connection.cursor()
         query = "CALL getRecipeByName('{0}')".format(r_name)
@@ -200,7 +193,10 @@ def getRecipeByName(r_name):
         return False
 
 
-def validateUser(username, password):
+def validateUser(_connection, username, password):
+    '''
+    TODO: What does this do?
+    '''
     try:
         cursor = _connection.cursor()
         query = "SELECT validateUser('{0}', '{1}');".format(username, password)
@@ -213,14 +209,12 @@ def validateUser(username, password):
         print('Error: %d: %s' % (e.args[0], e.args[1]))
         return False
 
-
-def getUserID(username):
+def getUserID(_connection, username):
     try:
         cursor = _connection.cursor()
         query = "SELECT getUserID('{0}');".format(username)
         cursor.execute(query)
         result = cursor.fetchone()
-
         return result
 
     except pymysql.Error as e:
@@ -228,22 +222,22 @@ def getUserID(username):
         return False
 
 
-def getUser(email, password):
+def getUser(_connection, email, password):
     try:
         cursor = _connection.cursor()
         query = "SELECT uid FROM user WHERE email = '{0}' AND password = '{1}';".format(email, password)
         cursor.execute(query)
-        result = cursor.fetchone()[0]
-        print(result)
-
-        return result
+        result = cursor.fetchone()
+        if (result == None):
+            return False
+        return result[0]
 
     except pymysql.Error as e:
         print('Error: %d: %s' % (e.args[0], e.args[1]))
         return False
 
 
-def addIngredient(r_id, i_name, diet_rest, amt):
+def addIngredient(_connection, r_id, i_name, diet_rest, amt):
     try:
         cursor = _connection.cursor()
         query = "CALL addIngredient({0}, '{1}', '{2}', {3});".format(r_id, i_name, diet_rest, amt)
@@ -254,37 +248,3 @@ def addIngredient(r_id, i_name, diet_rest, amt):
     except pymysql.Error as e:
         print('Error: %d: %s' % (e.args[0], e.args[1]))
         return False
-
-
-def getConnection(username, password, host='localhost', database='recipe_index'):
-    """
-    NOTE: this is for testing purposes! Remove this once integrated with gui
-    """
-    #  Creates a connection to the database, given a username and password, and returns it if its successful.
-    global _connection
-    if not _connection:
-        try:
-            _connection = pymysql.connect(host=host, user=username, password=password, db=database)
-            return _connection
-
-        except pymysql.err.OperationalError as e:
-            print('Error: %d: %s\n' % (e.args[0], e.args[1]))
-            print('Try again... \n')
-            return None
-
-
-def main():
-    """
-    NOTE: this is for testing purposes! Remove this once integrated with gui
-    """
-    if len(sys.argv) != 3:
-        print("Usage:", "python recipe_index.py username password")
-        sys.exit(1)
-
-    getConnection(sys.argv[1], sys.argv[2])
-    getUser('calderon.l@northeastern.edu', 'pass')
-    # try calling other functions and procedures here as well!
-
-
-if __name__ == "__main__":
-    main()
