@@ -30,6 +30,9 @@ class AnonSearch():
         result = searchByCook(self.connection, cook)
         print(result)
 
+    def close(self):
+        self.root.destroy()
+
 class LoggedInSearch():
     def __init__(self, connection, currentUser):
         self.loggedIn = True
@@ -50,7 +53,7 @@ class LoggedInSearch():
         entry_search_name.place(x=950,y=30)
 
         buttonSearch = Button(self.root, text='Search recipes', width=20,bg="black",fg='white', 
-            command = lambda: self.searchBy(entry_search_name.get(), self.variable.get()))
+            command = lambda: self.searchBy(entry_search_name.get(), variable.get()))
         buttonSearch.place(x=800,y=30)
 
         OPTIONS = [
@@ -58,13 +61,12 @@ class LoggedInSearch():
         "Total Cook Time",
         "Recipe Course"
         ] 
-        self.variable = StringVar(self.root)
-        self.variable.set(OPTIONS[0]) # default value
+        variable = StringVar(self.root)
+        variable.set(OPTIONS[0]) # default value
 
-        options = OptionMenu(self.root, self.variable, *OPTIONS)
+        options = OptionMenu(self.root, variable, *OPTIONS)
         options.place(x=1500,y=25)
 
-        self.root.mainloop()
         
     def loggedIn(self):
         return self.loggedIn
@@ -87,6 +89,8 @@ class LoggedInSearch():
         TODO: put the results in the GUI
         '''
         return None
+    def close(self):
+        self.root.destroy()
 
 def searchByName(connection, name):
     return sql_utils.getRecipeByName(connection, name)

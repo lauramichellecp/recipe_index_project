@@ -60,8 +60,8 @@ class LoginWindow():
     def userLogin(self, email, password):
         try:
             self.currentActiveUser = sql_utils.getUser(self.connection, email, password)
+            # something weird here, I think...
             if (self.currentActiveUser):
-                # keep search open if logged.
                 self.loggedIn = True
                 self.update_errorLabel("")
                 self.openSearch()
@@ -101,14 +101,7 @@ class LoginWindow():
             return False
 
     def openSearch(self):
-        if (self.searchScreen == None):
-            self.openLoggedInOrAnon()
-        else:
-            try:
-                self.searchScreen.root.destroy()
-                self.openLoggedInOrAnon()
-            except:
-                self.openLoggedInOrAnon()
+        self.openLoggedInOrAnon()
 
     def closeSearch(self):
         try:
@@ -117,11 +110,11 @@ class LoginWindow():
             print("could not close")
 
     def openLoggedInOrAnon(self):
+        self.closeSearch() # closing inst working, self.search seems to always be None... 
         if (self.loggedIn):
             self.searchScreen = search.LoggedInSearch(self.connection, self.currentActiveUser)
         else:
             self.searchScreen = search.AnonSearch(self.connection)
-
 
 def makeConnection(username, password, host='localhost', database='recipe_index'):
     try:
