@@ -110,7 +110,7 @@ class LoginWindow():
             print("could not close")
 
     def openLoggedInOrAnon(self):
-        self.closeSearch() # closing inst working, self.search seems to always be None... 
+        self.closeSearch()
         if (self.loggedIn):
             self.searchScreen = search.LoggedInSearch(self.connection, self.currentActiveUser)
         else:
