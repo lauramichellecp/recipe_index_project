@@ -43,12 +43,12 @@ def createUser(_connection, u_first, u_last, u_email, u_pass):
     return True
 
 
-def getRecipeByName(_connection, r_name):
+def getRecipesByName(_connection, r_name):
     try:
         cursor = _connection.cursor()
         query = "CALL getRecipeByName('{0}')".format(r_name)
         cursor.execute(query)
-        result = cursor.fetchone()
+        result = cursor.fetchall()
 
         return result
 
@@ -98,6 +98,19 @@ def getRecipesByAuthor(_connection, author_id):
         print('Error: %d: %s' % (e.args[0], e.args[1]))
         return False
 
+def getRecipesByAuthorName(_connection, author_name):
+    try:
+        cursor = _connection.cursor()
+        query = "CALL getRecipesByAuthorName('{0}');".format(author_name)
+        cursor.execute(query)
+        result = cursor.fetchall()
+
+        return result
+
+    except pymysql.Error as e:
+        print('Error: %d: %s' % (e.args[0], e.args[1]))
+        return False   
+
 
 def getRecipeByID(_connection, r_id):
     try:
@@ -112,10 +125,10 @@ def getRecipeByID(_connection, r_id):
         return False
 
 
-def getRecipesByCourse(_connection, course):
+def getRecipesByCourseName(_connection, course):
     try:
         cursor = _connection.cursor()
-        query = "CALL getRecipesByCourse('{0}');".format(course)
+        query = "CALL getRecipesByCourseName('{0}');".format(course)
         cursor.execute(query)
         result = cursor.fetchall()
         return result

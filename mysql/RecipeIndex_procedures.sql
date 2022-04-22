@@ -40,6 +40,19 @@ DELIMITER ;
 CALL getRecipesByAuthor(2);
 CALL getRecipesByAuthor(1);
 
+-- return recipes of this course name
+DELIMITER $$
+DROP PROCEDURE IF EXISTS getRecipesByAuthorName$$
+
+CREATE PROCEDURE getRecipesByAuthorName(IN a_name VARCHAR(16)) 
+BEGIN
+    CALL getRecipesByAuthor((SELECT uid FROM user WHERE first_name = a_name));
+END$$
+DELIMITER ;
+
+CALL getRecipesByAuthorName("Laura");
+CALL getRecipesByAuthorName("Maria");
+
 DELIMITER $$ 
 DROP PROCEDURE IF EXISTS getRecipeByID $$
 
@@ -106,6 +119,19 @@ DELIMITER ;
 
 CALL getRecipesByCourse(1);
 CALL getRecipesByCourse(2);
+
+-- return recipes of this course name
+DELIMITER $$
+DROP PROCEDURE IF EXISTS getRecipesByCourseName$$
+
+CREATE PROCEDURE getRecipesByCourseName(IN recipe_course VARCHAR(16)) 
+BEGIN
+    CALL getRecipesByCourse((SELECT cid FROM course WHERE course_name = recipe_course));
+END$$
+DELIMITER ;
+
+CALL getRecipesByCourseName("dessert");
+CALL getRecipesByCourseName("breakfast");
 
 -- return recipes with a prep time less than the given
 DELIMITER $$
