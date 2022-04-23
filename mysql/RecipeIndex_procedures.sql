@@ -64,6 +64,17 @@ DELIMITER ;
 
 CALL getRecipeByID(1);
 
+-- get recipe by name 
+
+DELIMITER $$
+DROP PROCEDURE IF EXISTS getRecipeByName$$
+
+CREATE PROCEDURE getRecipeByName(rname VARCHAR(64))
+BEGIN
+	SELECT * FROM recipe WHERE recipe_name LIKE concat("%",rname,"%");
+END$$
+DELIMITER ;
+
 -- Does this recipe follow this Dietary restriction?
 DELIMITER $$ 
 DROP FUNCTION IF EXISTS recipeToDR $$
@@ -91,8 +102,7 @@ BEGIN
 END$$
 DELIMITER ;
 
--- TODO: not working right now!
-SELECT recipeToDR(1, 1);
+SELECT recipeToDR(1, 1); 
 SELECT recipeToDR(1, 2);
 SELECT recipeToDR(2, 1);
 SELECT recipeToDR(2, 2);
@@ -105,6 +115,9 @@ BEGIN
 	SELECT * FROM recipe WHERE recipeToDR(rid,drid);
 END$$
 DELIMITER ;
+
+CALL getRecipeByDietary(1); 
+CALL getRecipeByDietary(3); 
 
 -- return recipes of this course 
 DELIMITER $$
@@ -198,7 +211,6 @@ CREATE PROCEDURE createRecipe(r_name VARCHAR(64),
 								r_course VARCHAR(16))
 BEGIN 
 	DECLARE course_id INT;
-    DECLARE sql_msg VARCHAR(16);
     DECLARE sql_error BOOL DEFAULT FALSE;
     DECLARE CONTINUE HANDLER FOR SQLEXCEPTION SET sql_error = TRUE;
     
@@ -217,7 +229,6 @@ BEGIN
 	  (SELECT EXISTS(SELECT recipe_name FROM recipe WHERE recipe_name = r_name))
 	THEN 
 		SET sql_error = TRUE;
---        SET @sql_msg = "Failed on recipe name";
 	ELSE 
 		INSERT INTO recipe (recipe_name, prep_time, cook_time, serving_size, 
 		cuisine, instructions, notes, description, author, course) VALUES
@@ -256,21 +267,24 @@ CREATE PROCEDURE addIngredients(recipe_id INT,
                                 amt VARCHAR(16))
 BEGIN 
     DECLARE ing_id INT;
+    DECLARE sql_error BOOL DEFAULT FALSE;
+    DECLARE CONTINUE HANDLER FOR SQLEXCEPTION SET sql_error = TRUE;
+    
 	START TRANSACTION;
     
 	IF 
       (SELECT EXISTS(SELECT iid FROM ingredient WHERE ingredient_name = ingredient))
     THEN 
       SET ing_id = (SELECT iid FROM ingredient WHERE ingredient_name = ingredient);
-      
-      IF NOT (SELECT EXISTS(SELECT drid FROM ingredient_follows 
-					WHERE iid = ing_id AND drid = diet_rest))
-	  THEN 
-		INSERT INTO ingredient_follows (iid, drid) VALUES (ing_id, diet_rest);
-	  END IF;
 	ELSE
       INSERT INTO ingredient (ingredient_name) VALUES (ingredient);
-	SET ing_id = (SELECT iid FROM ingredient WHERE ingredient_name = ingredient);
+	  SET ing_id = (SELECT iid FROM ingredient WHERE ingredient_name = ingredient);
+	END IF;
+    
+	IF NOT (SELECT EXISTS(SELECT drid FROM ingredient_follows 
+		WHERE iid = ing_id AND drid = diet_rest))
+	THEN 
+		INSERT INTO ingredient_follows (iid, drid) VALUES (ing_id, diet_rest);
 	END IF;
     
     IF NOT
@@ -280,11 +294,22 @@ BEGIN
 		INSERT INTO recipe_ingredient (rid, iid, amount) 
         VALUES (recipe_id, ing_id, amt);
 	END IF;
+    
+	IF sql_error = FALSE THEN
+		COMMIT;
+    ELSE
+		ROLLBACK;
+	END IF;
 END$$
 DELIMITER ;
 
 CALL addIngredients(1, 'salt and pepper', 1, 'a pinch');
-CALL addIngredients(1, 'salt and pepper', 2, 'a pinch');
+CALL addIngredients(1, 'salt and pepper', 2, 'a pinch'); 
+CALL addIngredients(1, 'ingredient', 1, '1 ts');
+CALL addIngredients(1, 'new ingredient', NULL, 'amt');
+SELECT * FROM ingredient;
+SELECT * FROM recipe_ingredient;
+SELECT * FROM ingredient_follows;
 
 -- create a user 
 DELIMITER $$
@@ -295,11 +320,22 @@ CREATE PROCEDURE createUser (user_first_name VARCHAR(16),
 							user_email VARCHAR(32),
 							user_password VARCHAR(32))
 BEGIN 
+    DECLARE sql_error BOOL DEFAULT FALSE;
+    DECLARE CONTINUE HANDLER FOR SQLEXCEPTION SET sql_error = TRUE;
+    
+	START TRANSACTION;
+    
 	IF NOT
 	  (SELECT EXISTS(SELECT uid FROM user WHERE email = user_email)) 
 	THEN 
 	  INSERT INTO user (first_name, last_name, email, password) VALUES 
 		(user_first_name, user_last_name, user_email, user_password);
+	END IF;
+    
+	IF sql_error = FALSE THEN
+		COMMIT;
+    ELSE
+		ROLLBACK;
 	END IF;
 END$$
 DELIMITER ;
@@ -315,10 +351,21 @@ DROP PROCEDURE IF EXISTS createBookmark$$
 
 CREATE PROCEDURE createBookmark(recipe_id INT, user_id INT)
 BEGIN 
+    DECLARE sql_error BOOL DEFAULT FALSE;
+    DECLARE CONTINUE HANDLER FOR SQLEXCEPTION SET sql_error = TRUE;
+    
+	START TRANSACTION;
+    
 	IF NOT
 	  (SELECT EXISTS(SELECT * FROM bookmark WHERE recipe_id = recipe AND user_id = uid))
 	THEN 
       INSERT INTO bookmark (uid, recipe) VALUES (user_id, recipe_id);
+	END IF;
+    
+	IF sql_error = FALSE THEN
+		COMMIT;
+    ELSE
+		ROLLBACK;
 	END IF;
 END $$
 DELIMITER ;
@@ -326,17 +373,6 @@ DELIMITER ;
 CALL createBookmark(1, 2);
 CALL getBookmarksByUser(2);
 CALL getBookmarksByUser(1);
-
--- get recipe by name 
-
-DELIMITER $$
-DROP PROCEDURE IF EXISTS getRecipeByName$$
-
-CREATE PROCEDURE getRecipeByName(rname VARCHAR(64))
-BEGIN
-	SELECT * FROM recipe WHERE recipe_name LIKE concat("%",rname,"%");
-END$$
-DELIMITER ;
 
 -- trigger to delete the ingredient to recipe links
 DELIMITER $$

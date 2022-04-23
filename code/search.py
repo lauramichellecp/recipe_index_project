@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import *
 import tkinter.ttk
 import sql_utils
+import add
 
 class AnonSearch():
     def __init__(self, connection):
@@ -121,11 +122,29 @@ class LoggedInSearch():
 
         self.errorLabel()
 
+        buttonAddNewRecipe = Button(self.root, text='Add New Recipe', width=20,bg="black",fg='white', 
+            command = lambda: add.AddRecipe(self.connection, currentUser))
+        buttonAddNewRecipe.place(x=1000,y=340)
+
+        buttonAddBookmark = Button(self.root, text='Add To Bookmarks', width=20,bg="black",fg='white', 
+            command = lambda: self.addBookmark(self.root, self.connection, currentUser))
+        buttonAddBookmark.place(x=1300,y=340)
+
         label_more_details =Label(self.root,text="Recipe Details", width=20,font=("bold",14))
         label_more_details.place(x=750,y=400)
 
 
     def loggedIn(self):
+        return self.loggedIn
+
+    def addBookmark(self, root, connection, user):
+        selected_recipe = self.recipe_tree.selection()[0]
+        self.recipe_tree.focus(selected_recipe)
+        
+        recipeId = self.recipe_tree.item(selected_recipe).values
+        
+        print("Add bookmark for current user '{0}' for recipe ID: {1}".format(user, recipeId))
+
         return self.loggedIn
 
     def searchBy(self, search, criteria, dr):

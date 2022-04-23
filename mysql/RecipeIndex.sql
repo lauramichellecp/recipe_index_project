@@ -7,7 +7,7 @@ USE recipe_index;
 -- ingredient table
 CREATE TABLE ingredient (
 iid INT PRIMARY KEY AUTO_INCREMENT,
-ingredient_name VARCHAR(16) NOT NULL
+ingredient_name VARCHAR(16) NOT NULL CHECK (LENGTH(ingredient_name) > 0)
 );
 
 INSERT INTO ingredient(ingredient_name) VALUES ('egg(s)'),('half and half'),('salt and pepper'),('onion(s)'),('baby spinach'),('bacon'),('Swiss cheese'),('pie crust');
@@ -23,17 +23,17 @@ INSERT INTO course(course_name) VALUES ('Breakfast'),('Lunch'),('Dinner'),('Dess
 -- user table
 CREATE TABLE user (
 uid INT PRIMARY KEY AUTO_INCREMENT,
-first_name VARCHAR(16) NOT NULL,
-last_name VARCHAR(16) NOT NULL,
-email VARCHAR(32) NOT NULL UNIQUE,
-password VARCHAR(32) NOT NULL
+first_name VARCHAR(16) NOT NULL CHECK (LENGTH(first_name) > 0),
+last_name VARCHAR(16) NOT NULL CHECK (LENGTH(last_name) > 0),
+email VARCHAR(32) NOT NULL UNIQUE CHECK (INSTR(email , '@') > 0),
+password VARCHAR(32) NOT NULL CHECK (LENGTH(password) >= 8)
 );
 
-INSERT INTO user(first_name,last_name,email,password) VALUES ('Laura','Calderon','calderon.l@northeastern.edu','pass'),('Maria','Arandia','arandia.m@northeastern.edu','pass');
+INSERT INTO user(first_name,last_name,email,password) VALUES ('Laura','Calderon','calderon.l@northeastern.edu','password'),('Maria','Arandia','arandia.m@northeastern.edu','password');
 
 CREATE TABLE recipe (
 rid INT PRIMARY KEY AUTO_INCREMENT,
-recipe_name VARCHAR(64) NOT NULL,
+recipe_name VARCHAR(64) NOT NULL CHECK (LENGTH(recipe_name) > 0),
 prep_time INT NOT NULL,
 cook_time INT NOT NULL,
 publish_date DATETIME NOT NULL DEFAULT now(), -- can we set this to default = now?
@@ -63,11 +63,17 @@ INSERT INTO recipe(recipe_name, prep_time, cook_time, serving_size, instructions
     'This Spinach and Bacon Quiche is baked in a tender and flakey pie crust and is one of my favorites brunch on the weekends.', 
     1, 
     1);
+    
+INSERT INTO recipe(recipe_name, prep_time, cook_time, serving_size, instructions, description, author, course)
+Values ('Name', 10, 12, 14, 'instructions here....', 'description', 2, 2);
+
+SELECT * FROM recipe;
+SELECT * FROM ingredient;
 
 CREATE TABLE recipe_ingredient (
 rid INT NOT NULL, 
 iid INT NOT NULL, 
-amount VARCHAR(16) NOT NULL, 
+amount VARCHAR(16) NOT NULL CHECK (LENGTH(amount) > 0), 
 CONSTRAINT fk_recipe FOREIGN KEY(rid) REFERENCES recipe(rid) ON UPDATE CASCADE ON DELETE CASCADE, 
 CONSTRAINT fk_ingredient FOREIGN KEY(iid) REFERENCES ingredient(iid) ON UPDATE CASCADE ON DELETE RESTRICT
 );
@@ -79,8 +85,7 @@ drid INT AUTO_INCREMENT PRIMARY KEY,
 dr_name VARCHAR(16) NOT NULL,
 descrip VARCHAR(200) NOT NULL
 );
-
-INSERT INTO dietary_restriction(dr_name, descrip) VALUES('V', 'vegan'),('GF', 'gluten free'),('VG', 'vegatarian'),('DF','dairy free'),('NF','nut free');
+INSERT INTO dietary_restriction(dr_name, descrip) VALUES('-', 'none'),('V', 'vegan'),('GF', 'gluten free'),('VG', 'vegatarian'),('DF','dairy free'),('NF','nut free');
 
 -- ingredient to dietary restriction table 
 CREATE TABLE ingredient_follows (
@@ -90,6 +95,8 @@ PRIMARY KEY(iid, drid),
 CONSTRAINT fk_ingredients FOREIGN KEY(iid) REFERENCES ingredient(iid) ON UPDATE CASCADE ON DELETE CASCADE,
 CONSTRAINT fk_dietrestrict FOREIGN KEY(drid) REFERENCES dietary_restriction(drid) ON UPDATE CASCADE ON DELETE RESTRICT
 );
+
+SELECT * FROM ingredient_follows;
 
 -- bookmark recipes to user 
 CREATE TABLE bookmark (
@@ -108,12 +115,4 @@ SELECT * FROM ingredient_follows;
 SELECT * FROM dietary_restriction;
 
 SELECT * FROM user;
-
-SELECT * FROM bookmark;
-
-INSERT INTO bookmark VALUES(1, 4);
-INSERT INTO bookmark VALUES(3, 4);
-
-DELETE FROM recipe WHERE rid = 4 AND recipe_name = 'Spinach and Bacon Quiche';
- 
 SELECT * FROM bookmark;
