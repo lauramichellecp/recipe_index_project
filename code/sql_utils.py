@@ -261,3 +261,14 @@ def addIngredient(_connection, r_id, i_name, diet_rest, amt):
     except pymysql.Error as e:
         print('Error: %d: %s' % (e.args[0], e.args[1]))
         return False
+
+def deleteRecipe(_connection, recipe_id):
+    try:
+        cursor = _connection.cursor()
+        query = "DELETE FROM recipe WHERE rid = {0};".format(recipe_id)
+        cursor.execute(query)
+
+    except pymysql.Error as e:
+        print('Error: %d: %s' % (e.args[0], e.args[1]))
+        return False
+    return True

@@ -27,8 +27,8 @@ class AnonSearch():
         result = searchByCook(self.connection, cook)
         print(result)
 
-    def searchByCourse(self, cook):
-        result = searchByCook(self.connection, cook)
+    def searchByCourse(self, course):
+        result = searchByCourse(self.connection, course)
         print(result)
 
     def close(self):
@@ -112,9 +112,8 @@ class LoggedInSearch():
         self.recipe_tree.heading('author', text='Author')
         self.recipe_tree.column("author", stretch=NO, width=50)
 
-        sb = Scrollbar(self.frame, orient=VERTICAL)
-        sb.pack(side=RIGHT, fill=Y)
-        self.recipe_tree.config(yscrollcommand=sb.set)
+        self.sb = Scrollbar(self.frame, orient=VERTICAL)
+        self.sb.pack(side=RIGHT, fill=Y)
 
         buttonDeleteRecipe = Button(self.root, text='Delete selected recipe', width=20,bg="black",fg='white', 
             command = lambda: self.deleteEnties())
@@ -127,27 +126,51 @@ class LoggedInSearch():
         buttonAddNewRecipe.place(x=1000,y=340)
 
         buttonAddBookmark = Button(self.root, text='Add To Bookmarks', width=20,bg="black",fg='white', 
-            command = lambda: self.addBookmark(self.root, self.connection, currentUser))
-        buttonAddBookmark.place(x=1300,y=340)
+            command = lambda: self.addBookmark(self.connection, currentUser))
+        buttonAddBookmark.place(x=1200,y=340)
 
         label_more_details =Label(self.root,text="Recipe Details", width=20,font=("bold",14))
         label_more_details.place(x=750,y=400)
 
+        label_instructions =Label(self.root,text="Instructions:", width=20,font=9)
+        label_instructions.place(x=750,y=430)
 
+        instructions_text = Text(self.root, height=20, width=60)
+        instructions_text.place(x=800,y=460)
+        instructions_text.insert(tk.END, "")
+
+        label_ingredients =Label(self.root,text="Ingredients:", width=20,font=9)
+        label_ingredients.place(x=1300,y=430)
+
+        # TODO - initialize tree view with items
+
+        
     def loggedIn(self):
         return self.loggedIn
 
-    def addBookmark(self, root, connection, user):
-        selected_recipe = self.recipe_tree.selection()[0]
-        self.recipe_tree.focus(selected_recipe)
-        
-        recipeId = self.recipe_tree.item(selected_recipe).values
-        
-        print("Add bookmark for current user '{0}' for recipe ID: {1}".format(user, recipeId))
+    def getRecipe(self, recipe):
+        self.recipe_tree.focus(recipe)
+        # gets the 3rd value from the treeview options (which has the information about the recipe) 
+        return list(self.recipe_tree.item(recipe).values())[2] 
 
-        return self.loggedIn
+    def addBookmark(self, connection, user):
+        try:
+            recipe = self.getRecipe(self.recipe_tree.selection()[0])
+            recipeId = recipe[0] # gets the recipeID
+            print(recipeId)
+            if (sql_utils.createBookmark(connection, recipeId, user)):
+                msg="Recipe added to bookmarks: #{0}".format(recipeId)
+                self.update_errorLabel(msg)
+            else:
+                raise Exception("could not create bookmark")
+        except:
+            msg="Could not add bookmark. Make sure you select a recipe and try again...".format()
+            self.update_errorLabel(msg)
+        
 
     def searchBy(self, search, criteria, dr):
+        self.recipe_tree.config(yscrollcommand=self.sb.set)
+        self.clearItems() # clear everything
         # Add dietary restriction!
         self.update_errorLabel("")
         if (criteria == 'Name'):
@@ -164,22 +187,41 @@ class LoggedInSearch():
 
     def parseResults(self, result):
         all_recipes = []
-        for tuple in result:
-            recipe = (str(tuple[0]), str(tuple[1]), str(tuple[9]), str(tuple[2]), str(tuple[3]), 
-            str(tuple[5]), str(tuple[6]), str(tuple[8]), str(tuple[10]), str(tuple[7]))
-            # append recipe to total recipes
-            all_recipes.append(recipe)
-        self.createEntries(all_recipes)
-        return None
+        try:
+            for tuple in result:
+                recipe = (str(tuple[0]), str(tuple[1]), str(tuple[9]), str(tuple[2]), str(tuple[3]), 
+                str(tuple[5]), str(tuple[6]), str(tuple[8]), str(tuple[10]), str(tuple[7]))
+                # append recipe to total recipes
+                all_recipes.append(recipe)
+            self.createEntries(all_recipes)
+        except:
+            msg="Could not search by the given filter. Try again.."
+            self.update_errorLabel(msg) 
 
     def deleteEnties(self):
+        try:
+            # Get selected item to Delete
+            selected_item = self.recipe_tree.selection()[0]
+            recipe = self.getRecipe(selected_item)
+            recipeId = recipe[0] # gets the recipeID
+            authorId = recipe[0] # gets the author (TODO: get author id!!)
+
+            # check if user can delete this entry, and give update message! 
+            if (sql_utils.isRecipeAuthor(self.connection, recipeId, authorId)):
+                sql_utils.deleteRecipe(self.connection, recipeId)
+                msg="Deleted recipe: #{0}".format(recipeId)
+                self.update_errorLabel(msg) 
+                self.recipe_tree.delete(selected_item)
+            else:
+                raise Exception('cannot delete')
+        except:
+            msg="Could not delete item. Make sure you select a recipe you've authored and try again...".format()
+            self.update_errorLabel(msg)
+
+    def clearItems(self):
         # Get selected item to Delete
-        selected_item = self.recipe_tree.selection()[0]
-        # check if user can delete this entry, and give update message!
-        msg="deleted"
-        self.update_errorLabel(msg)
-        self.recipe_tree.delete(selected_item)
-        
+        for item in self.recipe_tree.get_children():
+            self.recipe_tree.delete(item)        
     
     def createEntries(self, recipes):
         # Delete entries that are already in the tree!
@@ -188,12 +230,11 @@ class LoggedInSearch():
         for r in recipes:
             self.recipe_tree.insert('', tk.END, values=r)
             self.recipe_tree.pack()
-        print(recipes)
 
     def errorLabel(self):
         global label
         label=Label(self.root, text="", font=('Aerial 10'))
-        label.place(x=1000, y=340)
+        label.place(x=800, y=370)
 
     def remove_errorLabel(self):
         global label

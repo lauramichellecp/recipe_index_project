@@ -107,12 +107,13 @@ class LoginWindow():
         try:
             self.searchScreen.root.destroy()
         except:
-            print("could not close")
+            return False
 
     def openLoggedInOrAnon(self):
         self.closeSearch()
         if (self.loggedIn):
             self.searchScreen = search.LoggedInSearch(self.connection, self.currentActiveUser)
+            
         else:
             self.searchScreen = search.AnonSearch(self.connection)
 
