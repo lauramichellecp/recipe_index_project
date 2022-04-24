@@ -116,7 +116,7 @@ class LoggedInSearch():
         self.sb.pack(side=RIGHT, fill=Y)
 
         buttonDeleteRecipe = Button(self.root, text='Delete selected recipe', width=20,bg="black",fg='white', 
-            command = lambda: self.deleteEnties())
+            command = lambda: self.deleteEnties(currentUser))
         buttonDeleteRecipe.place(x=800,y=340)
 
         self.errorLabel()
@@ -126,7 +126,7 @@ class LoggedInSearch():
         buttonAddNewRecipe.place(x=1000,y=340)
 
         buttonAddBookmark = Button(self.root, text='Add To Bookmarks', width=20,bg="black",fg='white', 
-            command = lambda: self.addBookmark(self.connection, currentUser))
+            command = lambda: self.addBookmark(currentUser))
         buttonAddBookmark.place(x=1200,y=340)
 
         label_more_details =Label(self.root,text="Recipe Details", width=20,font=("bold",14))
@@ -153,12 +153,12 @@ class LoggedInSearch():
         # gets the 3rd value from the treeview options (which has the information about the recipe) 
         return list(self.recipe_tree.item(recipe).values())[2] 
 
-    def addBookmark(self, connection, user):
+    def addBookmark(self, user):
         try:
             recipe = self.getRecipe(self.recipe_tree.selection()[0])
             recipeId = recipe[0] # gets the recipeID
             print(recipeId)
-            if (sql_utils.createBookmark(connection, recipeId, user)):
+            if (sql_utils.createBookmark(self.connection, recipeId, user)):
                 msg="Recipe added to bookmarks: #{0}".format(recipeId)
                 self.update_errorLabel(msg)
             else:
@@ -198,16 +198,16 @@ class LoggedInSearch():
             msg="Could not search by the given filter. Try again.."
             self.update_errorLabel(msg) 
 
-    def deleteEnties(self):
+    def deleteEnties(self, currentUserId):
         try:
             # Get selected item to Delete
             selected_item = self.recipe_tree.selection()[0]
             recipe = self.getRecipe(selected_item)
             recipeId = recipe[0] # gets the recipeID
-            authorId = recipe[0] # gets the author (TODO: get author id!!)
 
             # check if user can delete this entry, and give update message! 
-            if (sql_utils.isRecipeAuthor(self.connection, recipeId, authorId)):
+            isAuthor = sql_utils.isRecipeAuthor(self.connection, recipeId, currentUserId)
+            if (isAuthor):
                 sql_utils.deleteRecipe(self.connection, recipeId)
                 msg="Deleted recipe: #{0}".format(recipeId)
                 self.update_errorLabel(msg) 
