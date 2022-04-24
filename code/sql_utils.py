@@ -1,6 +1,7 @@
 import pymysql
 import sys
 
+
 def createRecipe(_connection, r_name, r_prep_time, r_cook_time, r_serving_size,
                  r_cuisine, r_instruct, r_note, r_descrip, current_user, r_course):
     """
@@ -97,6 +98,7 @@ def getRecipesByAuthor(_connection, author_id):
     except pymysql.Error as e:
         print('Error: %d: %s' % (e.args[0], e.args[1]))
         return False
+
 
 def getRecipesByAuthorName(_connection, author_name):
     try:
@@ -255,12 +257,12 @@ def addIngredient(_connection, r_id, i_name, diet_rest, amt):
         cursor = _connection.cursor()
         query = "CALL addIngredient({0}, '{1}', '{2}', {3});".format(r_id, i_name, diet_rest, amt)
         cursor.execute(query)
-
         return True
 
     except pymysql.Error as e:
         print('Error: %d: %s' % (e.args[0], e.args[1]))
         return False
+
 
 def deleteRecipe(_connection, recipe_id):
     try:
@@ -272,3 +274,28 @@ def deleteRecipe(_connection, recipe_id):
         print('Error: %d: %s' % (e.args[0], e.args[1]))
         return False
     return True
+
+
+def getRecipeByDietary(_connection, diet_rest):
+    try:
+        cursor = _connection.cursor()
+        query = "CALL getRecipeByDietary('{0}');".format(diet_rest)
+        cursor.execute(query)
+        result = cursor.fetchall()
+        return result
+
+    except pymysql.Error as e:
+        print('Error: %d: %s' % (e.args[0], e.args[1]))
+        return False
+
+
+def recipeToDR(_connection, r_id, dr_id):
+    try:
+        cursor = _connection.cursor()
+        query = "CALL recipeToDR({0}, {1});".format(r_id, dr_id)
+        cursor.execute(query)
+        result = cursor.fetchone()
+        return result
+    except pymysql.Error as e:
+        print('Error: %d: %s' % (e.args[0], e.args[1]))
+        return False
