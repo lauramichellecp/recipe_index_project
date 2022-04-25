@@ -275,6 +275,40 @@ def deleteRecipe(_connection, recipe_id):
         return False
     return True
 
+def updateRecipeInstructions(_connection, recipe_id, instructions, author):
+    try:
+        cursor = _connection.cursor()
+        query = "UPDATE recipe SET instructions = '{0}' WHERE rid = {1} AND author = {2};".format(instructions, recipe_id, author)
+        cursor.execute(query)
+
+    except pymysql.Error as e:
+        print('Error: %d: %s' % (e.args[0], e.args[1]))
+        return False
+    return True
+
+def updateRecipeIngredient(_connection, recipe_id, instructions, ingredient, amount, author):
+    try:
+        cursor = _connection.cursor()
+        print("updating ingredients...")
+        #query = "UPDATE recipe SET instructions = '{0}' WHERE rid = {1} AND author = {2};".format(instructions, recipe_id, author)
+        #cursor.execute(query)
+
+    except pymysql.Error as e:
+        print('Error: %d: %s' % (e.args[0], e.args[1]))
+        return False
+    return True
+
+def getIngredients(_connection, recipe_id):
+    try:
+        cursor = _connection.cursor()
+        query = "SELECT * FROM recipe_ingredient WHERE rid = {0};".format(recipe_id)
+        cursor.execute(query)
+
+    except pymysql.Error as e:
+        print('Error: %d: %s' % (e.args[0], e.args[1]))
+        return False
+    return True
+
 
 def getRecipeByDietary(_connection, diet_rest):
     try:

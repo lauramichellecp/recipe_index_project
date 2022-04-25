@@ -64,8 +64,21 @@ INSERT INTO recipe(recipe_name, prep_time, cook_time, serving_size, instructions
     1, 
     1);
     
+UPDATE recipe SET instructions = '1. Preheat the oven to 375 degrees F. Roll out pie dough into a circle. Place in 9 inch pie dish and crimp edges.
+	2. Blind bake crust: Place a piece of parchment paper inside the pie pan and add 2 cups of pie weights, dry beans or rice. 
+    Bake at 375 degrees F for 15 minutes. Remove parchment paper and pie weights. Prick pie crust all over with a fork, then return to the oven for 8 more minutes.
+	3. Meanwhile, cook bacon, in a skillet. Remove to a plate and chop. Remove most of the grease from the pan and add onion and spinach. 
+    Saute for 2 minutes. Add cheese, onion, spinach, and bacon to the bottom of the partially baked pie crust.
+	4. Combine the eggs, half and half, salt, and pepper in a blender, then pour the egg mixture into the pie.
+	5. Reduce oven temperature to 350 degrees. Bake quiche for 40- 45 minutes until the egg is set. Allow to cool before slicing. 
+    Store leftovers, covered, in the fridge.' WHERE rid = 4 AND author = 1;
+    
+SELECT * FROM recipe;
+    
 INSERT INTO recipe(recipe_name, prep_time, cook_time, serving_size, instructions, description, author, course)
 Values ('Name', 10, 12, 14, 'instructions here....', 'description', 2, 2);
+INSERT INTO recipe(recipe_name, prep_time, cook_time, serving_size, instructions, description, author, course)
+Values ('Can only delete me', 80, 12, 5, 'instructions here....', 'description', 3, 4);
 
 SELECT * FROM recipe;
 SELECT * FROM ingredient;

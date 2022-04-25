@@ -5,6 +5,7 @@ import pymysql
 import sql_utils
 import signup
 import search
+import anonSearch
 
 class LoginWindow():
     def __init__(self, connection):
@@ -115,7 +116,7 @@ class LoginWindow():
             self.searchScreen = search.LoggedInSearch(self.connection, self.currentActiveUser)
             
         else:
-            self.searchScreen = search.AnonSearch(self.connection)
+            self.searchScreen = anonSearch.AnonSearch(self.connection)
 
 def makeConnection(username, password, host='localhost', database='recipe_index'):
     try:
