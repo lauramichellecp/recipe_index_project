@@ -33,7 +33,8 @@ DROP PROCEDURE IF EXISTS getRecipesByAuthor$$
 
 CREATE PROCEDURE getRecipesByAuthor(IN authorId INT) -- return all recipes given the author id 
 BEGIN
-	SELECT * FROM recipe WHERE author = authorId ORDER BY publish_date DESC;
+	SELECT rid, recipe_name, description, prep_time, cook_time, serving_size, cuisine, notes, user.first_name, instructions FROM recipe LEFT JOIN user ON author = uid 
+    WHERE author = authorId ORDER BY publish_date DESC;
 END$$
 DELIMITER ;
 
@@ -64,6 +65,19 @@ DELIMITER ;
 
 CALL getRecipeByID(1);
 
+DELIMITER $$ 
+DROP PROCEDURE IF EXISTS getRecipeByID $$
+
+CREATE PROCEDURE getRecipeByID(IN id INT)
+BEGIN 
+	SELECT rid, recipe_name, description, prep_time, cook_time, serving_size, cuisine, notes, user.first_name, instructions FROM recipe LEFT JOIN user ON author = uid 
+    WHERE rid = id ORDER BY publish_date DESC;
+END$$
+DELIMITER ;
+
+CALL getRecipeByID(1);
+
+
 -- get recipe by name 
 
 DELIMITER $$
@@ -71,7 +85,8 @@ DROP PROCEDURE IF EXISTS getRecipeByName$$
 
 CREATE PROCEDURE getRecipeByName(rname VARCHAR(64))
 BEGIN
-	SELECT * FROM recipe WHERE recipe_name LIKE concat("%",rname,"%");
+	SELECT rid, recipe_name, description, prep_time, cook_time, serving_size, cuisine, notes, user.first_name, instructions FROM recipe LEFT JOIN user ON author = uid 
+    WHERE recipe_name LIKE concat("%",rname,"%") ORDER BY publish_date DESC;
 END$$
 DELIMITER ;
 
@@ -112,7 +127,8 @@ DROP PROCEDURE IF EXISTS getRecipeByDietary $$
 
 CREATE PROCEDURE getRecipeByDietary(IN drid INT) -- return all recipes given the drid
 BEGIN 
-	SELECT * FROM recipe WHERE recipeToDR(rid,drid);
+	SELECT rid, recipe_name, description, prep_time, cook_time, serving_size, cuisine, notes, user.first_name, instructions FROM recipe LEFT JOIN user ON author = uid 
+    WHERE recipeToDR(rid,drid) ORDER BY publish_date DESC;
 END$$
 DELIMITER ;
 
@@ -125,8 +141,8 @@ DROP PROCEDURE IF EXISTS getRecipesByCourse$$
 
 CREATE PROCEDURE getRecipesByCourse(IN recipe_course INT) 
 BEGIN
-	SELECT * FROM recipe WHERE course = recipe_course 
-    ORDER BY publish_date DESC;
+	SELECT rid, recipe_name, description, prep_time, cook_time, serving_size, cuisine, notes, user.first_name, instructions FROM recipe LEFT JOIN user ON author = uid 
+    WHERE course = recipe_course ORDER BY publish_date DESC;
 END$$
 DELIMITER ;
 
@@ -152,7 +168,7 @@ DROP PROCEDURE IF EXISTS getRecipesByPrepTime$$
 
 CREATE PROCEDURE getRecipesByPrepTime(IN prep_time_max INT) 
 BEGIN
-	SELECT * FROM recipe WHERE prep_time <= prep_time_max
+	SELECT rid, recipe_name, description, prep_time, cook_time, serving_size, cuisine, notes, user.first_name, instructions FROM recipe LEFT JOIN user ON author = uid WHERE prep_time <= prep_time_max
     ORDER BY publish_date DESC;
 END$$
 DELIMITER ;
@@ -166,7 +182,7 @@ DROP PROCEDURE IF EXISTS getRecipesByCookTime$$
 
 CREATE PROCEDURE getRecipesByCookTime(IN cook_time_max INT) 
 BEGIN
-	SELECT * FROM recipe WHERE cook_time <= cook_time_max
+	SELECT rid, recipe_name, description, prep_time, cook_time, serving_size, cuisine, notes, user.first_name, instructions FROM recipe LEFT JOIN user ON author = uid WHERE cook_time <= cook_time_max
     ORDER BY publish_date DESC;
 END$$
 DELIMITER ;
@@ -177,7 +193,7 @@ DROP PROCEDURE IF EXISTS getRecipesByTotalTime$$
 
 CREATE PROCEDURE getRecipesByTotalTime(IN time_max INT) 
 BEGIN
-	SELECT * FROM recipe WHERE (cook_time + prep_time) <= time_max -- idk if this works
+	SELECT rid, recipe_name, description, prep_time, cook_time, serving_size, cuisine, notes, user.first_name, instructions FROM recipe LEFT JOIN user ON author = uid WHERE (cook_time + prep_time) <= time_max
     ORDER BY publish_date DESC;
 END$$
 DELIMITER ;
@@ -376,6 +392,7 @@ CALL getBookmarksByUser(1);
 
 -- trigger to delete the ingredient to recipe links
 DELIMITER $$
+DROP TRIGGER IF EXISTS recipe_ingredient_trigger$$
 CREATE TRIGGER recipe_ingredient_trigger
 	AFTER DELETE ON recipe
 	FOR EACH ROW 

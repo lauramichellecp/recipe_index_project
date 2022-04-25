@@ -9,9 +9,10 @@ def createRecipe(_connection, r_name, r_prep_time, r_cook_time, r_serving_size,
     """
     try:
         cursor = _connection.cursor()
-        query = "CALL createRecipe('{0}', {1}, {2}, {3}, '{4}', '{5}', '{6}', '{7}', {8}, '{9}');" \
+        query = 'CALL createRecipe("{0}", {1}, {2}, {3}, "{4}", "{5}", "{6}", "{7}", {8}, "{9}");' \
             .format(r_name, r_prep_time, r_cook_time, r_serving_size, r_cuisine, r_instruct, r_note, r_descrip,
                     current_user, r_course)
+        
         cursor.execute(query)
 
     except pymysql.Error as e:
@@ -255,7 +256,7 @@ def getUser(_connection, email, password):
 def addIngredient(_connection, r_id, i_name, diet_rest, amt):
     try:
         cursor = _connection.cursor()
-        query = "CALL addIngredient({0}, '{1}', '{2}', {3});".format(r_id, i_name, diet_rest, amt)
+        query = "CALL addIngredients({0}, '{1}', '{2}', {3});".format(r_id, i_name, diet_rest, amt)
         cursor.execute(query)
         return True
 

@@ -182,8 +182,8 @@ class LoggedInSearch():
         all_recipes = []
         try:
             for tuple in result:
-                recipe = (str(tuple[0]), str(tuple[1]), str(tuple[9]), str(tuple[2]), str(tuple[3]), 
-                str(tuple[5]), str(tuple[6]), str(tuple[8]), str(tuple[10]), str(tuple[7]))
+                recipe = (str(tuple[0]), str(tuple[1]), str(tuple[2]), str(tuple[3]), str(tuple[4]), 
+                str(tuple[5]), str(tuple[6]), str(tuple[7]), str(tuple[8]), str(tuple[9]))
                 # append recipe to total recipes
                 all_recipes.append(recipe)
             self.createEntries(all_recipes)
