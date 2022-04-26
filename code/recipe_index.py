@@ -19,42 +19,46 @@ class LoginWindow():
         self.root.geometry("300x350")
         self.root.title('Welcome to Recipe Index!')
 
-        label_0 =Label(self.root,text="Login", width=20,font=("bold",18))
-        label_0.place(x=0,y=30)
+        #creating a frame for the form
+        frame = Frame(self.root, width=300, height=350)
+        frame.pack(expand=True)
 
-        label_email =Label(self.root,text="Email", width=20,font=("bold",10))
-        label_email.place(x=0,y=80)
+        login_label =Label(frame, text="Login", width=20,font=("bold",20))
+        login_label.grid(row=0,column=0, columnspan=2, padx=20, pady=20, sticky=N)
 
-        entry_email=Entry(self.root, width=20)
-        entry_email.place(x=115,y=80)
-        entry_email.insert(0, "")
+        label_email =Label(frame,text="Email", width=20,font=("bold",10))
+        label_email.grid(row=1,column=0)
 
-        label_pass =Label(self.root,text="Password", width=20,font=("bold",10))
-        label_pass.place(x=0,y=100)
+        entry_email=Entry(frame, width=10)
+        entry_email.grid(row=1,column=1)
+        #entry_email.insert(0, "")
 
-        entry_password=Entry(self.root, show="*")
-        entry_password.place(x=115,y=100)
-        entry_password.insert(0, "")
+        label_pass =Label(frame,text="Password", width=20,font=("bold",10))
+        label_pass.grid(row=2,column=0)
 
-        buttonLoggedIn = Button(self.root, text='Login', width=10,bg="black",fg='white', 
+        entry_password=Entry(frame, show="*", width=10)
+        entry_password.grid(row=2,column=1)
+        #entry_password.insert(0, "")
+
+        buttonLoggedIn = Button(frame, text='Login', width=10,bg="black",fg='white',
             command = lambda: self.userLogin(entry_email.get(), entry_password.get()))
-        buttonLoggedIn.place(x=50,y=150)
+        buttonLoggedIn.grid(row=4,column=0, columnspan=2, padx=5, pady=5, sticky=N)
 
-        buttonLogout = Button(self.root, text='Logout', width=10,bg="black",fg='white', 
+        buttonLogout = Button(frame, text='Logout', width=10,bg="black",fg='white',
             command = lambda: self.userLogout())
-        buttonLogout.place(x=150,y=150)
+        buttonLogout.grid(row=5,column=0, columnspan=2, padx=5, pady=5, sticky=N)
 
-        buttonSignUp = Button(self.root, text='Signup', width=25,bg="black",fg='white', 
+        buttonSignUp = Button(frame, text='Signup', width=25,bg="black",fg='white',
             command = lambda: self.userSignup())
-        buttonSignUp.place(x=50,y=200)
+        buttonSignUp.grid(row=6,column=0, columnspan=2, padx=5, pady=5, sticky=N)
 
-        buttonSearch = Button(self.root, text='Search for recipes...', width=25,bg="black",fg='white', 
+        buttonSearch = Button(frame, text='Search for recipes...', width=25,bg="black",fg='white',
             command = lambda: self.openSearch())
-        buttonSearch.place(x=50,y=250)
+        buttonSearch.grid(row=7,column=0, columnspan=2,padx=5, pady=5, sticky=N)
 
         self.errorLabel()
 
-        self.root.attributes('-topmost',True)
+        #self.root.attributes('-topmost',True)
 
         self.root.mainloop()
     
@@ -63,6 +67,7 @@ class LoginWindow():
             user = sql_utils.getUser(self.connection, email, password)
             self.currentActiveUser = user[0]
             self.currentActiveUserName = user[1]
+            print(self.currentActiveUser)
             # something weird here, I think...
             if (self.currentActiveUser):
                 self.loggedIn = True

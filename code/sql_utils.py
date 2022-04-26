@@ -264,8 +264,10 @@ def getUser(_connection, email, password):
     try:
         cursor = _connection.cursor()
         query = "SELECT uid, first_name FROM user WHERE email = '{0}' AND password = '{1}';".format(email, password)
+        print(query)
         cursor.execute(query)
         result = cursor.fetchone()
+        print(result)
         if (result == None):
             return False
         return result
