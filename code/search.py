@@ -14,11 +14,11 @@ class LoggedInSearch():
         self.root.geometry("2000x850")
         self.root.title('Recipe Index')
 
-        label_user =Label(self.root,text="Hi, {0}! Welcome to Recipe Index. Here are your bookmarks".format(currentUserName),font=8)
-        label_user.place(x=30,y=60)
+        label_user =Label(self.root,text="Hi, {0}! Welcome to Recipe Index. Here are your bookmarks".format(currentUserName),font=6)
+        label_user.place(x=50,y=70)
 
-        label_bookmarks =Label(self.root,text="Bookmarks", width=20,font=("bold",14))
-        label_bookmarks.place(x=0,y=30)
+        label_bookmarks =Label(self.root,text="Bookmarks", font=("bold",14))
+        label_bookmarks.place(x=50,y=30)
 
         bookmarks_columns = ('id', 'name', 'ptime', 'ctime', 'servings', 'cuisine', 'author')
         recipe_columns = ('id', 'name', 'description', 'ptime', 'ctime', 'servings', 'cuisine', 'notes', 'author')
@@ -31,7 +31,7 @@ class LoggedInSearch():
         self.bookmarks_tree.heading('id', text='ID')
         self.bookmarks_tree.column("id", stretch=NO, width=50)
         self.bookmarks_tree.heading('name', text='Recipe Name')
-        self.bookmarks_tree.column("name", width=150)
+        self.bookmarks_tree.column("name", width=160)
         self.bookmarks_tree.heading('ptime', text='Prep Time')
         self.bookmarks_tree.column("ptime", stretch=NO, width=50)
         self.bookmarks_tree.heading('ctime', text='Cook Time')
@@ -39,9 +39,9 @@ class LoggedInSearch():
         self.bookmarks_tree.heading('servings', text='Servings')
         self.bookmarks_tree.column("servings", stretch=NO, width=50)
         self.bookmarks_tree.heading('cuisine', text='Cuisine')
-        self.bookmarks_tree.column("cuisine", stretch=NO, width=80)
+        self.bookmarks_tree.column("cuisine", stretch=NO, width=90)
         self.bookmarks_tree.heading('author', text='Author')
-        self.bookmarks_tree.column("author", stretch=NO, width=80)
+        self.bookmarks_tree.column("author", stretch=NO, width=90)
 
         self.bookmark_sb = Scrollbar(self.frame_book, orient=VERTICAL)
         self.bookmark_sb.pack(side=RIGHT, fill=Y)
@@ -56,9 +56,6 @@ class LoggedInSearch():
         self.bookmark_instructions = Text(self.root, height=10, width=75)
         self.bookmark_instructions.place(x=50,y=410)
         self.bookmark_instructions.insert(1.0, " ")
-
-        self.bookmarks_tree.bind("<Key>", self.showBookmarks(currentUser))
-        self.bookmarks_tree.bind("<Double-1>", self.showBookmarkDetails)
 
         separator = tkinter.ttk.Separator(self.root, orient='vertical')
         separator.place(x=700,y=0, relwidth=0.2, relheight=1)
@@ -162,12 +159,12 @@ class LoggedInSearch():
         label_ingredients =Label(self.root,text="Ingredients:", width=20,font=9)
         label_ingredients.place(x=1300,y=430)
 
-        # TODO - initialize tree view with items
-        self.ingredients_frame = Frame(self.root, width=200, height=200)
+        self.ingredients_frame = Frame(self.root, width=200, height=400)
         self.ingredients_frame.place(x=1350, y=460)
 
         recipe_ingredients_columns = ('id', 'name', 'amount')
-        self.recipe_ingredients_tree = tkinter.ttk.Treeview(self.ingredients_frame, columns=recipe_ingredients_columns, show='headings')
+        self.recipe_ingredients_tree = tkinter.ttk.Treeview(self.ingredients_frame, 
+            columns=recipe_ingredients_columns, show='headings')
         self.recipe_ingredients_tree.heading('id', text='ID')
         self.recipe_ingredients_tree.column("id", stretch=NO, width=75)
         self.recipe_ingredients_tree.heading('name', text='Name')
@@ -179,8 +176,44 @@ class LoggedInSearch():
         self.sb2.pack(side=RIGHT, fill=Y)
         self.recipe_ingredients_tree.config(yscrollcommand=self.sb2.set)
 
-        self.recipe_tree.bind("<Double-1>", self.doubleClick)
+        new_recipe_ingredient_label = Label(self.root, text="Add Ingredient to recipe:", anchor='w', width=60, font=("bold", 13))
+        new_recipe_ingredient_label.place(x=1350,y=710)
 
+        ingredient_name = Label(self.root, text="Name", anchor='w', width=60, font=("bold", 10))
+        ingredient_name.place(x=1350,y=740)
+        new_recipe_ingredient_name = Entry(self.root, width=20, font=("bold", 10))
+        new_recipe_ingredient_name.place(x=1500,y=740)
+
+        ingredient_amount = Label(self.root, text="Amount", anchor='w', width=60, font=("bold", 10))
+        ingredient_amount.place(x=1350,y=765)
+        new_recipe_ingredient_amount = Entry(self.root, width=20, font=("bold", 10))
+        new_recipe_ingredient_amount.place(x=1500,y=765)
+
+        buttonAddIngredient = Button(self.root, text='Add Ingredient', width=15,bg="black",fg='white', 
+            command = lambda: self.addIngredient(currentUser, new_recipe_ingredient_name.get(), new_recipe_ingredient_amount.get()))
+        buttonAddIngredient.place(x=1600,y=765)
+
+        # bookmark ingredients
+
+        self.bookmark_ingredients_frame = Frame(self.root, width=450, height=100)
+        self.bookmark_ingredients_frame.place(x=50,y=600)
+
+        self.bookmark_recipe_ingredients_tree = tkinter.ttk.Treeview(self.bookmark_ingredients_frame, 
+            columns=recipe_ingredients_columns, show='headings')
+        self.bookmark_recipe_ingredients_tree.heading('id', text='ID')
+        self.bookmark_recipe_ingredients_tree.column("id", stretch=NO, width=100)
+        self.bookmark_recipe_ingredients_tree.heading('name', text='Name')
+        self.bookmark_recipe_ingredients_tree.column("name", stretch=NO, width=260)
+        self.bookmark_recipe_ingredients_tree.heading('amount', text='Amount')
+        self.bookmark_recipe_ingredients_tree.column("amount", stretch=NO, width=230)
+
+        self.sb3 = Scrollbar(self.bookmark_ingredients_frame, orient=VERTICAL)
+        self.sb3.pack(side=RIGHT, fill=Y)
+        self.bookmark_recipe_ingredients_tree.config(yscrollcommand=self.sb3.set)
+
+        self.recipe_tree.bind("<Double-1>", self.doubleClick)
+        self.bookmarks_tree.bind("<Double-1>", self.bookmarkdoubleClick)
+        self.bookmarks_tree.bind("<Key>", self.showBookmarks(currentUser))
         
     def loggedIn(self):
         return self.loggedIn
@@ -208,15 +241,6 @@ class LoggedInSearch():
                 self.bookmarks_tree.insert('', tk.END, values=r)
                 self.bookmarks_tree.pack()
 
-    def showBookmarkDetails(self, event):
-        try:
-            self.bookmark_instructions.delete(1.0, "end")
-            recipe = self.getBookmark(self.bookmarks_tree.selection()[0])
-            recipeInstructions = recipe[7]
-            self.bookmark_instructions.insert(1.0, recipeInstructions)
-        except:
-            return False
-
     def removeBookmark(self, user):
         # Get selected item to Delete
         selected_item = self.bookmarks_tree.selection()[0]
@@ -238,6 +262,24 @@ class LoggedInSearch():
                 raise Exception("could not create bookmark")
         except:
             msg="Could not add bookmark. Make sure you select a recipe and try again...".format()
+            self.update_errorLabel(msg, "red")
+    
+    def addIngredient(self, user, name, amount):
+        try:
+            # Get selected item to Update
+            selected_item = self.recipe_tree.selection()[0]
+            recipe = self.getRecipe(selected_item)
+            recipeId = recipe[0] # gets the recipeId
+
+            isAuthor = sql_utils.isRecipeAuthor(self.connection, recipeId, user)
+            if (isAuthor and sql_utils.addIngredient(self.connection, recipeId, name, 0, amount)):
+                msg="Ingredient added to recipe: #{0}".format(recipeId)
+                self.update_errorLabel(msg, "black")
+                self.showBookmarks(user)
+            else:
+                raise Exception("could not add ingredient")
+        except:
+            msg="Could not add ingredient. Make sure you're selecting a recipe you've authored and try again...".format()
             self.update_errorLabel(msg, "red")
         
     def searchBy(self, search, criteria, dr):
@@ -290,6 +332,17 @@ class LoggedInSearch():
         except:
             msg="Could not show recipe ingredients. Try again.."
             self.update_errorLabel(msg, "red")
+
+    def getBookmarkIngredients(self):
+        recipe = self.getRecipe(self.bookmarks_tree.selection()[0])
+        recipeId = recipe[0] # get the recipeId from the selection
+        result = sql_utils.getIngredients(self.connection, recipeId)
+        all_ingredients = []
+        for tuple in result:
+            item = (str(tuple[0]), str(tuple[2]), str(tuple[1]))
+            # append ingredients to total recipes
+            all_ingredients.append(item)
+        self.createBookmarkIngredientEntries(all_ingredients)
     
     def createIngredientEntries(self, ingredients):
         try:
@@ -300,6 +353,16 @@ class LoggedInSearch():
         for r in ingredients:
             self.recipe_ingredients_tree.insert('', tk.END, values=r)
             self.recipe_ingredients_tree.pack()
+
+    def createBookmarkIngredientEntries(self, ingredients):
+        try:
+            for item in self.bookmark_recipe_ingredients_tree.get_children():
+                self.bookmark_recipe_ingredients_tree.delete(item)     
+        except:
+            print("nothing to delete")
+        for r in ingredients:
+            self.bookmark_recipe_ingredients_tree.insert('', tk.END, values=r)
+            self.bookmark_recipe_ingredients_tree.pack()
 
     def deleteEnties(self, currentUserId):
         try:
@@ -342,6 +405,16 @@ class LoggedInSearch():
             recipeInstructions = recipe[9]
             self.instructions_text.insert(1.0, recipeInstructions)
             self.getIngredients()
+        except:
+            return False
+        
+    def bookmarkdoubleClick(self, event):
+        try:
+            self.bookmark_instructions.delete(1.0, "end")
+            recipe = self.getBookmark(self.bookmarks_tree.selection()[0])
+            recipeInstructions = recipe[7]
+            self.bookmark_instructions.insert(1.0, recipeInstructions)
+            self.getBookmarkIngredients()
         except:
             return False
 
