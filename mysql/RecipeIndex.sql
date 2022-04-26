@@ -129,3 +129,19 @@ SELECT * FROM dietary_restriction;
 
 SELECT * FROM user;
 SELECT * FROM bookmark;
+
+	SELECT rid, recipe_name, prep_time, cook_time, serving_size, cuisine, user.first_name, instructions FROM bookmark 
+	JOIN recipe ON bookmark.recipe = recipe.rid
+    JOIN user ON recipe.author = user.uid
+    WHERE bookmark.uid = 1;
+
+SELECT * FROM bookmark WHERE uid = 1;
+
+SELECT rid, recipe_name, prep_time, cook_time, serving_size, cuisine, uid, instructions FROM bookmark 
+	JOIN recipe WHERE uid = 1
+	ORDER BY publish_date DESC; 
+    
+DELETE FROM bookmark WHERE uid = 1 AND recipe = 17;
+
+SELECT ingredient.iid, amount, ingredient_name, rid FROM recipe_ingredient JOIN ingredient ON recipe_ingredient.iid = ingredient.iid;
+

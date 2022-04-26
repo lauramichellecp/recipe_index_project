@@ -198,13 +198,38 @@ BEGIN
 END$$
 DELIMITER ;
 
+-- return recipes with a serving size = size
+DELIMITER $$
+DROP PROCEDURE IF EXISTS getRecipesByServings$$
+
+CREATE PROCEDURE getRecipesByServings(IN size INT) 
+BEGIN
+	SELECT rid, recipe_name, description, prep_time, cook_time, serving_size, cuisine, notes, user.first_name, instructions FROM recipe LEFT JOIN user ON author = uid 
+    WHERE serving_size = size ORDER BY publish_date DESC;
+END$$
+DELIMITER ;
+
 -- return all bookmarks for a user by uid
 DELIMITER $$
 DROP PROCEDURE IF EXISTS getBookmarksByUser$$
 
 CREATE PROCEDURE getBookmarksByUser(IN id INT) 
 BEGIN
-	SELECT * FROM bookmark WHERE uid = id; 
+	SELECT rid, recipe_name, prep_time, cook_time, serving_size, cuisine, user.first_name, instructions FROM bookmark 
+	JOIN recipe ON bookmark.recipe = recipe.rid
+    JOIN user ON recipe.author = user.uid
+    WHERE bookmark.uid = id;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+DROP PROCEDURE IF EXISTS getIngredients$$
+
+CREATE PROCEDURE getIngredients(IN recipeId INT)
+BEGIN
+	SELECT ingredient.iid, amount, ingredient_name, rid FROM recipe_ingredient 
+	JOIN ingredient ON recipe_ingredient.iid = ingredient.iid
+    WHERE rid = recipeId;
 END$$
 DELIMITER ;
 
