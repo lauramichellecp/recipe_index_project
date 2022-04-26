@@ -5,7 +5,7 @@ import sql_utils
 import add
 
 class LoggedInSearch():
-    def __init__(self, connection, currentUser):
+    def __init__(self, connection, currentUser, currentUserName):
         self.loggedIn = True
         self.connection = connection
 
@@ -14,8 +14,51 @@ class LoggedInSearch():
         self.root.geometry("2000x850")
         self.root.title('Recipe Index')
 
+        label_user =Label(self.root,text="Hi, {0}! Welcome to Recipe Index. Here are your bookmarks".format(currentUserName),font=8)
+        label_user.place(x=30,y=60)
+
         label_bookmarks =Label(self.root,text="Bookmarks", width=20,font=("bold",14))
         label_bookmarks.place(x=0,y=30)
+
+        bookmarks_columns = ('id', 'name', 'ptime', 'ctime', 'servings', 'cuisine', 'author')
+        recipe_columns = ('id', 'name', 'description', 'ptime', 'ctime', 'servings', 'cuisine', 'notes', 'author')
+
+        self.frame_book = Frame(self.root, width=300, height=800)
+        self.frame_book.place(x=50, y=100)
+
+        self.bookmarks_tree = tkinter.ttk.Treeview(self.frame_book, columns=bookmarks_columns, show="headings")
+        # recipe_name, prep_time, cook_time, serving_size, cuisine, user.first_name, instructions
+        self.bookmarks_tree.heading('id', text='ID')
+        self.bookmarks_tree.column("id", stretch=NO, width=50)
+        self.bookmarks_tree.heading('name', text='Recipe Name')
+        self.bookmarks_tree.column("name", width=150)
+        self.bookmarks_tree.heading('ptime', text='Prep Time')
+        self.bookmarks_tree.column("ptime", stretch=NO, width=50)
+        self.bookmarks_tree.heading('ctime', text='Cook Time')
+        self.bookmarks_tree.column("ctime", stretch=NO, width=50)
+        self.bookmarks_tree.heading('servings', text='Servings')
+        self.bookmarks_tree.column("servings", stretch=NO, width=50)
+        self.bookmarks_tree.heading('cuisine', text='Cuisine')
+        self.bookmarks_tree.column("cuisine", stretch=NO, width=80)
+        self.bookmarks_tree.heading('author', text='Author')
+        self.bookmarks_tree.column("author", stretch=NO, width=80)
+
+        self.bookmark_sb = Scrollbar(self.frame_book, orient=VERTICAL)
+        self.bookmark_sb.pack(side=RIGHT, fill=Y)
+
+        buttonRemoveBookmark = Button(self.root, text='Remove selected bookmark', width=30,bg="black",fg='white', 
+            command = lambda: self.removeBookmark(currentUser))
+        buttonRemoveBookmark.place(x=50,y=340)
+
+        label_bookmark_instructions =Label(self.root,text="Recipe Instructions:", width=20,font=9)
+        label_bookmark_instructions.place(x=30,y=380)        
+
+        self.bookmark_instructions = Text(self.root, height=10, width=75)
+        self.bookmark_instructions.place(x=50,y=410)
+        self.bookmark_instructions.insert(1.0, " ")
+
+        self.bookmarks_tree.bind("<Key>", self.showBookmarks(currentUser))
+        self.bookmarks_tree.bind("<Double-1>", self.showBookmarkDetails)
 
         separator = tkinter.ttk.Separator(self.root, orient='vertical')
         separator.place(x=700,y=0, relwidth=0.2, relheight=1)
@@ -32,7 +75,10 @@ class LoggedInSearch():
 
         OPTIONS = [
         "Name",
+        "Max Prep Time",
         "Max Cook Time",
+        "Max Total Time",
+        "Serving Size",
         "Course",
         "Author",
         ] 
@@ -61,8 +107,8 @@ class LoggedInSearch():
         self.frame = Frame(self.root, width=200, height=800)
         self.frame.place(x=800, y=100)
 
-        recipe_columns = ('id', 'name', 'description', 'ptime', 'ctime', 'servings', 'cuisine', 'notes', 'author')
         self.recipe_tree = tkinter.ttk.Treeview(self.frame, columns=recipe_columns, show='headings')
+        # command= lambda: self.searchBy('', 'Name', '-')
         self.recipe_tree.heading('id', text='ID')
         self.recipe_tree.column("id", stretch=NO, width=50)
         self.recipe_tree.heading('name', text='Recipe Name')
@@ -84,8 +130,6 @@ class LoggedInSearch():
 
         self.sb = Scrollbar(self.frame, orient=VERTICAL)
         self.sb.pack(side=RIGHT, fill=Y)
-
-        self.recipe_tree.bind("<Double-1>", self.doubleClick)
 
         buttonDeleteRecipe = Button(self.root, text='Delete selected recipe', width=20,bg="black",fg='white', 
             command = lambda: self.deleteEnties(currentUser))
@@ -120,22 +164,22 @@ class LoggedInSearch():
 
         # TODO - initialize tree view with items
         self.ingredients_frame = Frame(self.root, width=200, height=200)
-        self.ingredients_frame.place(x=1300, y=460)
+        self.ingredients_frame.place(x=1350, y=460)
 
         recipe_ingredients_columns = ('id', 'name', 'amount')
         self.recipe_ingredients_tree = tkinter.ttk.Treeview(self.ingredients_frame, columns=recipe_ingredients_columns, show='headings')
         self.recipe_ingredients_tree.heading('id', text='ID')
-        self.recipe_ingredients_tree.column("id", stretch=NO, width=50)
+        self.recipe_ingredients_tree.column("id", stretch=NO, width=75)
         self.recipe_ingredients_tree.heading('name', text='Name')
-        self.recipe_ingredients_tree.column("name", stretch=NO, width=50)
-        self.recipe_ingredients_tree.heading('amount', text='Quantity')
-        self.recipe_ingredients_tree.column("amount", stretch=NO, width=50)
+        self.recipe_ingredients_tree.column("name", stretch=NO, width=200)
+        self.recipe_ingredients_tree.heading('amount', text='Amount')
+        self.recipe_ingredients_tree.column("amount", stretch=NO, width=150)
 
         self.sb2 = Scrollbar(self.ingredients_frame, orient=VERTICAL)
         self.sb2.pack(side=RIGHT, fill=Y)
         self.recipe_ingredients_tree.config(yscrollcommand=self.sb2.set)
 
-        self.recipe_ingredients_tree.bind("<Double-1>", self.getIngredients)
+        self.recipe_tree.bind("<Double-1>", self.doubleClick)
 
         
     def loggedIn(self):
@@ -145,6 +189,42 @@ class LoggedInSearch():
         self.recipe_tree.focus(recipe)
         # gets the 3rd value from the treeview options (which has the information about the recipe) 
         return list(self.recipe_tree.item(recipe).values())[2] 
+    
+    def getBookmark(self, recipe):
+        self.bookmarks_tree.focus(recipe)
+        # gets the 3rd value from the treeview options (which has the information about the recipe) 
+        return list(self.bookmarks_tree.item(recipe).values())[2] 
+
+    def showBookmarks(self, user):
+        self.bookmarks_tree.config(yscrollcommand=self.bookmark_sb.set)
+        self.bookmark_instructions.delete(1.0, "end")
+        for item in self.bookmarks_tree.get_children():
+            self.bookmarks_tree.delete(item) # remove all bookmarks
+        
+        bookmarks = sql_utils.getBookmarksByUser(self.connection, user)
+        if (bookmarks):
+            self.bookmarks_tree.delete()
+            for r in bookmarks:
+                self.bookmarks_tree.insert('', tk.END, values=r)
+                self.bookmarks_tree.pack()
+
+    def showBookmarkDetails(self, event):
+        try:
+            self.bookmark_instructions.delete(1.0, "end")
+            recipe = self.getBookmark(self.bookmarks_tree.selection()[0])
+            recipeInstructions = recipe[7]
+            self.bookmark_instructions.insert(1.0, recipeInstructions)
+        except:
+            return False
+
+    def removeBookmark(self, user):
+        # Get selected item to Delete
+        selected_item = self.bookmarks_tree.selection()[0]
+        recipe = self.getBookmark(selected_item)
+        recipeId = recipe[0] # gets the recipeID
+
+        sql_utils.removeBookmarksByUser(self.connection, user, recipeId)
+        self.showBookmarks(user)
 
     def addBookmark(self, user):
         try:
@@ -153,23 +233,28 @@ class LoggedInSearch():
             if (sql_utils.createBookmark(self.connection, recipeId, user)):
                 msg="Recipe added to bookmarks: #{0}".format(recipeId)
                 self.update_errorLabel(msg, "black")
+                self.showBookmarks(user)
             else:
                 raise Exception("could not create bookmark")
         except:
             msg="Could not add bookmark. Make sure you select a recipe and try again...".format()
             self.update_errorLabel(msg, "red")
         
-
     def searchBy(self, search, criteria, dr):
-
         self.recipe_tree.config(yscrollcommand=self.sb.set)
         self.clearItems() # clear everything
         # Add dietary restriction!
         self.update_errorLabel("", "black")
         if (criteria == 'Name'):
             result = searchByName(self.connection, search)
+        elif (criteria == 'Max Prep Time'):
+            result = searchByPrep(self.connection, search)
         elif (criteria == 'Max Cook Time'):
             result = searchByCook(self.connection, search)
+        elif (criteria == 'Max Total Time'):
+            result = searchByTotal(self.connection, search)
+        elif (criteria == 'Serving Size'):
+            result = searchByServings(self.connection, search)
         elif (criteria == 'Course'):
             result = searchByCourse(self.connection, search)
         elif (criteria == 'Author'):
@@ -192,21 +277,26 @@ class LoggedInSearch():
             self.update_errorLabel(msg, "red")
 
     def getIngredients(self):
-        result = self.getIngredients(self.getRecipe(self.recipe_tree.selection()[0]))
+        recipe = self.getRecipe(self.recipe_tree.selection()[0])
+        recipeId = recipe[0] # get the recipeId from the selection
+        result = sql_utils.getIngredients(self.connection, recipeId)
         all_ingredients = []
         try:
             for tuple in result:
-                item = (str(tuple[0]), str(tuple[1]), str(tuple[2]))
+                item = (str(tuple[0]), str(tuple[2]), str(tuple[1]))
                 # append ingredients to total recipes
                 all_ingredients.append(item)
             self.createIngredientEntries(all_ingredients)
         except:
-            msg="Could not search by the given filter. Try again.."
+            msg="Could not show recipe ingredients. Try again.."
             self.update_errorLabel(msg, "red")
     
     def createIngredientEntries(self, ingredients):
-        self.recipe_ingredients_tree.delete()
-        rows = []
+        try:
+            for item in self.recipe_ingredients_tree.get_children():
+                self.recipe_ingredients_tree.delete(item)     
+        except:
+            print("nothing to delete")
         for r in ingredients:
             self.recipe_ingredients_tree.insert('', tk.END, values=r)
             self.recipe_ingredients_tree.pack()
@@ -221,9 +311,11 @@ class LoggedInSearch():
             # check if user can delete this entry, and give update message! 
             isAuthor = sql_utils.isRecipeAuthor(self.connection, recipeId, currentUserId)
             if (isAuthor and sql_utils.deleteRecipe(self.connection, recipeId)):
+                self.recipe_tree.delete(selected_item) # remove from recipes in gui
+                self.instructions_text.delete(1.0, "end")
+                self.showBookmarks(currentUserId) # update bookmarks
                 msg="Deleted recipe: #{0}".format(recipeId)
-                self.update_errorLabel(msg, "black") 
-                self.recipe_tree.delete(selected_item)
+                self.update_errorLabel(msg, "black")  # display success message
             else:
                 raise Exception('cannot delete')
         except:
@@ -239,7 +331,6 @@ class LoggedInSearch():
     def createEntries(self, recipes):
         # Delete entries that are already in the tree!
         self.recipe_tree.delete()
-        rows = []
         for r in recipes:
             self.recipe_tree.insert('', tk.END, values=r)
             self.recipe_tree.pack()
@@ -250,6 +341,7 @@ class LoggedInSearch():
             recipe = self.getRecipe(self.recipe_tree.selection()[0])
             recipeInstructions = recipe[9]
             self.instructions_text.insert(1.0, recipeInstructions)
+            self.getIngredients()
         except:
             return False
 
@@ -266,6 +358,7 @@ class LoggedInSearch():
                 msg="Updated recipe: #{0}".format(recipeId)
                 self.update_errorLabel(msg, "black") 
                 self.searchBy(self.entry_search_name.get(), self.search_variable.get(), self.dr_variable.get())
+                self.showBookmarks(currentUserId)
             else:
                 raise Exception('cannot delete')
         except:
@@ -313,8 +406,17 @@ class LoggedInSearch():
 def searchByName(connection, name):
     return sql_utils.getRecipesByName(connection, name)
 
+def searchByPrep(connection, prep):
+    return sql_utils.getRecipesByPrepTime(connection, prep)
+
 def searchByCook(connection, cook):
     return sql_utils.getRecipesByCookTime(connection, cook)
+
+def searchByTotal(connection, total):
+    return sql_utils.getRecipesByTotalTime(connection, total)
+
+def searchByServings(connection, servings):
+    return sql_utils.getRecipesByServings(connection, servings)
 
 def searchByCourse(connection, course):
     return sql_utils.getRecipesByCourseName(connection, course)
@@ -325,6 +427,3 @@ def searchByAuthorName(connection, first_name):
 def searchByDietaryRestriction(connection, restriction):
     # TODO: check any ingredient.
     return True
-
-def searchIngredients(connection, recipeId):
-    return sql_utils.getIngredients(connection, recipeId)

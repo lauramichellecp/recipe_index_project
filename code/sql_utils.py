@@ -154,6 +154,18 @@ def getRecipesByPrepTime(_connection, prep_time_max):
         print('Error: %d: %s' % (e.args[0], e.args[1]))
         return False
 
+def getRecipesByServings(_connection, serving_size):
+    try:
+        cursor = _connection.cursor()
+        query = "CALL getRecipesByServings({0});".format(serving_size)
+        cursor.execute(query)
+        result = cursor.fetchall()
+        return result
+
+    except pymysql.Error as e:
+        print('Error: %d: %s' % (e.args[0], e.args[1]))
+        return False
+
 
 def getRecipesByCookTime(_connection, cook_time_max):
     try:
@@ -181,10 +193,23 @@ def getRecipesByTotalTime(_connection, time_max):
         return False
 
 
-def getBookmarkByUser(_connection, current_user):
+def getBookmarksByUser(_connection, current_user):
     try:
         cursor = _connection.cursor()
-        query = "CALL getBookmarkByUser({0});".format(current_user)
+        query = "CALL getBookmarksByUser({0});".format(current_user)
+        cursor.execute(query)
+        result = cursor.fetchall()
+
+        return result
+
+    except pymysql.Error as e:
+        print('Error: %d: %s' % (e.args[0], e.args[1]))
+        return False
+
+def removeBookmarksByUser(_connection, current_user, recipeId):
+    try:
+        cursor = _connection.cursor()
+        query = "DELETE FROM bookmark WHERE uid = {0} AND recipe = {1};".format(current_user, recipeId)
         cursor.execute(query)
         result = cursor.fetchall()
 
@@ -210,9 +235,6 @@ def getRecipeByName(_connection, r_name):
 
 
 def validateUser(_connection, username, password):
-    '''
-    TODO: What does this do?
-    '''
     try:
         cursor = _connection.cursor()
         query = "SELECT validateUser('{0}', '{1}');".format(username, password)
@@ -241,22 +263,21 @@ def getUserID(_connection, username):
 def getUser(_connection, email, password):
     try:
         cursor = _connection.cursor()
-        query = "SELECT uid FROM user WHERE email = '{0}' AND password = '{1}';".format(email, password)
+        query = "SELECT uid, first_name FROM user WHERE email = '{0}' AND password = '{1}';".format(email, password)
         cursor.execute(query)
         result = cursor.fetchone()
         if (result == None):
             return False
-        return result[0]
+        return result
 
     except pymysql.Error as e:
         print('Error: %d: %s' % (e.args[0], e.args[1]))
         return False
 
-
 def addIngredient(_connection, r_id, i_name, diet_rest, amt):
     try:
         cursor = _connection.cursor()
-        query = "CALL addIngredients({0}, '{1}', '{2}', {3});".format(r_id, i_name, diet_rest, amt)
+        query = "CALL addIngredients({0}, '{1}', '{2}', '{3}');".format(r_id, i_name, diet_rest, amt)
         cursor.execute(query)
         return True
 
@@ -302,13 +323,14 @@ def updateRecipeIngredient(_connection, recipe_id, instructions, ingredient, amo
 def getIngredients(_connection, recipe_id):
     try:
         cursor = _connection.cursor()
-        query = "SELECT * FROM recipe_ingredient WHERE rid = {0};".format(recipe_id)
+        query = "CALL getIngredients({0});".format(recipe_id)
         cursor.execute(query)
+        result = cursor.fetchall()
+        return result
 
     except pymysql.Error as e:
         print('Error: %d: %s' % (e.args[0], e.args[1]))
         return False
-    return True
 
 
 def getRecipeByDietary(_connection, diet_rest):

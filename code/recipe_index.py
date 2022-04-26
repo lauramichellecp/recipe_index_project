@@ -60,7 +60,9 @@ class LoginWindow():
     
     def userLogin(self, email, password):
         try:
-            self.currentActiveUser = sql_utils.getUser(self.connection, email, password)
+            user = sql_utils.getUser(self.connection, email, password)
+            self.currentActiveUser = user[0]
+            self.currentActiveUserName = user[1]
             # something weird here, I think...
             if (self.currentActiveUser):
                 self.loggedIn = True
@@ -113,7 +115,7 @@ class LoginWindow():
     def openLoggedInOrAnon(self):
         self.closeSearch()
         if (self.loggedIn):
-            self.searchScreen = search.LoggedInSearch(self.connection, self.currentActiveUser)
+            self.searchScreen = search.LoggedInSearch(self.connection, self.currentActiveUser, self.currentActiveUserName)
             
         else:
             self.searchScreen = anonSearch.AnonSearch(self.connection)

@@ -19,13 +19,12 @@ class AnonSearch():
         entry_search_name=Entry(self.root, width=100)
         entry_search_name.place(x=205,y=70)
 
-        buttonSearch = Button(self.root, text='Search recipes', width=20,bg="black",fg='white', 
-            command = lambda: self.searchBy(entry_search_name.get(), search_variable.get(), dr_variable.get()))
-        buttonSearch.place(x=55,y=70)
-
         OPTIONS = [
         "Name",
+        "Max Prep Time",
         "Max Cook Time",
+        "Max Total Time",
+        "Serving Size",
         "Course",
         "Author",
         ] 
@@ -35,6 +34,10 @@ class AnonSearch():
         search_options = OptionMenu(self.root, search_variable, *OPTIONS)
         search_options.place(x=755,y=65)
         search_options.configure(width=15)
+
+        buttonSearch = Button(self.root, text='Search recipes', width=20,bg="black",fg='white', 
+            command = lambda: self.searchBy(entry_search_name.get(), search_variable.get(), dr_variable.get()))
+        buttonSearch.place(x=55,y=70)
 
         OPTIONS_DR = [
         "-",
@@ -111,8 +114,14 @@ class AnonSearch():
         self.update_errorLabel("")
         if (criteria == 'Name'):
             result = searchByName(self.connection, search)
+        elif (criteria == 'Max Prep Time'):
+            result = searchByPrep(self.connection, search)
         elif (criteria == 'Max Cook Time'):
             result = searchByCook(self.connection, search)
+        elif (criteria == 'Max Total Time'):
+            result = searchByTotal(self.connection, search)
+        elif (criteria == 'Serving Size'):
+            result = searchByServings(self.connection, search)
         elif (criteria == 'Course'):
             result = searchByCourse(self.connection, search)
         elif (criteria == 'Author'):
@@ -125,8 +134,8 @@ class AnonSearch():
         all_recipes = []
         try:
             for tuple in result:
-                recipe = (str(tuple[0]), str(tuple[1]), str(tuple[9]), str(tuple[2]), str(tuple[3]), 
-                str(tuple[5]), str(tuple[6]), str(tuple[8]), str(tuple[10]), str(tuple[7]))
+                recipe = (str(tuple[0]), str(tuple[1]), str(tuple[2]), str(tuple[3]), str(tuple[4]), 
+                str(tuple[5]), str(tuple[6]), str(tuple[7]), str(tuple[8]), str(tuple[9]))
                 # append recipe to total recipes
                 all_recipes.append(recipe)
             self.createEntries(all_recipes)
@@ -176,8 +185,17 @@ class AnonSearch():
 def searchByName(connection, name):
     return sql_utils.getRecipesByName(connection, name)
 
+def searchByPrep(connection, prep):
+    return sql_utils.getRecipesByPrepTime(connection, prep)
+
 def searchByCook(connection, cook):
     return sql_utils.getRecipesByCookTime(connection, cook)
+
+def searchByTotal(connection, total):
+    return sql_utils.getRecipesByTotalTime(connection, total)
+
+def searchByServings(connection, servings):
+    return sql_utils.getRecipesByServings(connection, servings)
 
 def searchByCourse(connection, course):
     return sql_utils.getRecipesByCourseName(connection, course)
