@@ -10,14 +10,13 @@ class AnonSearch():
 
         # Open Search without Bookmarks, etc.
         self.root = Tk() # Window
-        self.root.geometry("1150x850")
+        self.root.geometry("1000x800") # Size
         self.root.title('Recipe Index')
-        
-        label_search =Label(self.root,text="Search for recipes", width=20,font=("bold",14))
-        label_search.place(x=20,y=30)
 
-        entry_search_name=Entry(self.root, width=100)
-        entry_search_name.place(x=205,y=70)
+        main_frame = Frame(self.root, width=800, height=800)
+
+        entry_search_name=Entry(main_frame, width=40)
+        entry_search_name.grid(row=1,column=1, columnspan=2)
 
         OPTIONS = [
         "Name",
@@ -28,17 +27,16 @@ class AnonSearch():
         "Course",
         "Author",
         ] 
-        search_variable = StringVar(self.root)
+        search_variable = StringVar(main_frame)
         search_variable.set(OPTIONS[0])
 
-        search_options = OptionMenu(self.root, search_variable, *OPTIONS)
-        search_options.place(x=755,y=65)
-        search_options.configure(width=15)
+        search_options = OptionMenu(main_frame, search_variable, *OPTIONS)
+        search_options.grid(row=1,column=3)
+        search_options.configure(width=10)
 
-        buttonSearch = Button(self.root, text='Search recipes', width=20,bg="black",fg='white', 
+        buttonSearch = Button(main_frame, text='Search recipes', width=20,bg="black",fg='white',
             command = lambda: self.searchBy(entry_search_name.get(), search_variable.get(), dr_variable.get()))
-        buttonSearch.place(x=55,y=70)
-
+        buttonSearch.grid(row=1,column=0)
         OPTIONS_DR = [
         "-",
         "Vegan",
@@ -47,24 +45,24 @@ class AnonSearch():
         "Dairy Free",
         "Nut Free"
         ] 
-        dr_variable = StringVar(self.root)
+        dr_variable = StringVar(main_frame)
         dr_variable.set(OPTIONS_DR[0])
 
-        dietary_options = OptionMenu(self.root, dr_variable, *OPTIONS_DR)
-        dietary_options.place(x=855,y=65)
-        dietary_options.configure(width=12)
+        dietary_options = OptionMenu(main_frame, dr_variable, *OPTIONS_DR)
+        dietary_options.grid(row=1,column=5)
+        dietary_options.configure(width=7)
 
-        self.frame = Frame(self.root, width=200, height=800)
-        self.frame.place(x=55, y=100)
+        self.frame = Frame(main_frame, width=400, height=400)
+        self.frame.grid(row=2,column=0, columnspan=6)
 
         recipe_columns = ('id', 'name', 'description', 'ptime', 'ctime', 'servings', 'cuisine', 'notes', 'author')
         self.recipe_tree = tkinter.ttk.Treeview(self.frame, columns=recipe_columns, show='headings')
         self.recipe_tree.heading('id', text='ID')
         self.recipe_tree.column("id", stretch=NO, width=50)
         self.recipe_tree.heading('name', text='Recipe Name')
-        self.recipe_tree.column("name", width=200)
+        self.recipe_tree.column("name", width=150)
         self.recipe_tree.heading('description', text='Description')
-        self.recipe_tree.column("description", width=300)
+        self.recipe_tree.column("description", width=200)
         self.recipe_tree.heading('ptime', text='Prep Time')
         self.recipe_tree.column("ptime", stretch=NO, width=50)
         self.recipe_tree.heading('ctime', text='Cook Time')
@@ -72,9 +70,9 @@ class AnonSearch():
         self.recipe_tree.heading('servings', text='Servings')
         self.recipe_tree.column("servings", stretch=NO, width=50)
         self.recipe_tree.heading('cuisine', text='Cuisine')
-        self.recipe_tree.column("cuisine", stretch=NO, width=120)
+        self.recipe_tree.column("cuisine", stretch=NO, width=100)
         self.recipe_tree.heading('notes', text='Notes')
-        self.recipe_tree.column("notes", width=120)
+        self.recipe_tree.column("notes", width=150)
         self.recipe_tree.heading('author', text='Author')
         self.recipe_tree.column("author", stretch=NO, width=50)
 
@@ -83,21 +81,50 @@ class AnonSearch():
 
         self.recipe_tree.bind("<Double-1>", self.doubleClick)
 
-        label_prompt_login=Label(self.root, text="Log in to create and update your own recipes and bookmark your favorites!", font=("bold",12))
-        label_prompt_login.place(x=55, y=350)
+        label_prompt_login=Label(main_frame, text="Log in to create and update your own recipes and bookmark your favorites!", font=("bold",12))
+        label_prompt_login.grid(row=3,column=0, columnspan=6, sticky=N, pady=10)
 
-        label_more_details =Label(self.root,text="Recipe Details", width=20,font=("bold",14))
-        label_more_details.place(x=5,y=400)
+        main_frame.pack(side=TOP,expand=True)
 
-        label_instructions =Label(self.root,text="Instructions:", width=20,font=9)
-        label_instructions.place(x=5,y=430)
+        recipe_frame = Frame(self.root, width=400, height=100)
+        instructions_frame = Frame(recipe_frame, width=200, height=300)
+        ingredients = Frame(recipe_frame, width=200, height=300)
 
-        self.instructions_text = Text(self.root, height=20, width=60)
-        self.instructions_text.place(x=55,y=460)
+        label_more_details =Label(recipe_frame,text="Recipe Details", width=20,font=("bold",20))
+        #label_more_details.grid(row=0,column=0,columnspan=6, sticky=N, pady=10, padx=10)
+        label_more_details.pack(side=TOP, expand=True)
+
+        label_instructions =Label(instructions_frame,text="Instructions:", width=20,font=10)
+        label_instructions.grid(row=0,column=0, sticky=W)
+
+        self.instructions_text = Text(instructions_frame, height=20, width=50)
+        self.instructions_text.grid(row=1,column=0, sticky=W)
         self.instructions_text.insert(tk.END, "")
 
-        label_ingredients =Label(self.root,text="Ingredients:", width=20,font=9)
-        label_ingredients.place(x=555,y=430)
+        label_ingredients =Label(ingredients,text="Ingredients:", width=20,font=10)
+        label_ingredients.grid(row=0,column=0, sticky=W, pady=10)
+
+        self.ingredients_frame = Frame(ingredients, width=200, height=400)
+        self.ingredients_frame.grid(row=1,column=0, sticky=N, pady=10)
+
+        recipe_ingredients_columns = ('id', 'name', 'amount')
+        self.recipe_ingredients_tree = tkinter.ttk.Treeview(self.ingredients_frame,
+            columns=recipe_ingredients_columns, show='headings')
+        self.recipe_ingredients_tree.heading('id', text='ID')
+        self.recipe_ingredients_tree.column("id", stretch=NO, width=75)
+        self.recipe_ingredients_tree.heading('name', text='Name')
+        self.recipe_ingredients_tree.column("name", stretch=NO, width=200)
+        self.recipe_ingredients_tree.heading('amount', text='Amount')
+        self.recipe_ingredients_tree.column("amount", stretch=NO, width=150)
+
+        self.sb2 = Scrollbar(self.ingredients_frame, orient=VERTICAL)
+        self.sb2.pack(side=RIGHT, fill=Y)
+        self.recipe_ingredients_tree.config(yscrollcommand=self.sb2.set)
+
+        recipe_frame.pack(side=TOP, expand=True)
+        instructions_frame.pack(side=LEFT, expand=True)
+        ingredients.pack(side=RIGHT, expand=True)
+
 
     def loggedIn(self):
         return self.loggedIn

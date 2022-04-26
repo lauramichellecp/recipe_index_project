@@ -16,7 +16,7 @@ class LoginWindow():
 
         #Providing title to the form
         self.root = Tk() # Window
-        self.root.geometry("300x350")
+        self.root.geometry("500x500")
         self.root.title('Welcome to Recipe Index!')
 
         #creating a frame for the form

@@ -10,7 +10,8 @@ class SignupWindow():
         #Providing title to the form
         self.root = Tk() # Window
 
-        self.root.geometry("300x300")
+
+        self.root.geometry("500x500")
         self.root.title('Sign Up')
 
         #creating a frame for the form
