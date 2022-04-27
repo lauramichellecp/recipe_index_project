@@ -85,7 +85,7 @@ class LoginWindow():
 
     def userSignup(self):
         try:
-            return signup.signUpScreen(self.connection)
+            return signup.SignupWindow(self.connection)
         except pymysql.Error as e:
             return False        
 

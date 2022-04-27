@@ -50,16 +50,23 @@ class SignupWindow():
             command = lambda: self.signup(entry_name.get(), entry_last.get(), entry_email.get(), entry_password.get()))
         buttonSignUp.grid(row=5,column=0, columnspan=2, sticky=S)
 
-        self.root.mainloop()
+        Label(frame, text="", font=('Aerial 10')).grid(row=6)
+        self.label=Label(frame, text="", font=('Aerial 10'))
+        self.label.grid(row=7, column=0, sticky=S, columnspan=2)
 
     def signup(self, first, last, email, password):
-        try:
+        if ((len(first) < 1 or len(last) < 1) or '@' not in email or len(password) < 8): 
+            self.update_errorLabel("Name must not be blank. Email must be valid. Pssword must be at least 8 characters.", "red")
+        else:
             signupUser = sql_utils.createUser(self.connection, first, last, email, password)
-            print(signupUser)
-            self.root.destroy()
-        except pymysql.Error as e:
-            return False
-        return True
+            if (not signupUser):
+                self.update_errorLabel("Could not sign up. Try again", "red")
+            else:
+                self.root.destroy()
 
-def signUpScreen(connection):
-    test = SignupWindow(connection)
+    def update_errorLabel(self, msg, color):
+        try:
+            self.label["text"]=msg
+            self.label.config(fg=color)
+        except:
+            return False
