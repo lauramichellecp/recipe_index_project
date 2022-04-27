@@ -304,7 +304,17 @@ class LoggedInSearch():
             result = searchByAuthorName(self.connection, search)
         else:
             result = searchByName(self.connection, search)
-        self.parseResults(result)
+        filteredResults = self.filterByDR(dr, result)
+        self.parseResults(filteredResults)
+
+    def filterByDR(self, restriction, recipes):
+        dr = getRestrictionType(restriction) # get restriction id
+
+        recipes_following_dr = []
+        for r in recipes:
+            if (dr == 1 or searchByDietaryRestriction(self.connection, r[0], dr)): # check if recipe follows given dr
+                recipes_following_dr.append(r)
+        return recipes_following_dr
 
     def parseResults(self, result):
         all_recipes = []
@@ -471,6 +481,22 @@ class LoggedInSearch():
         except:
             return False
 
+def getRestrictionType(restriction):
+    if (restriction == '-'):
+        return 1
+    elif (restriction == 'Vegan'):
+        return 2
+    elif (restriction == 'Vegetarian'):
+        return 3
+    elif (restriction == 'Gluten Free'):
+        return 4
+    elif (restriction == 'Dairy Free'):
+        return 5
+    elif (restriction == 'Nut Free'):
+        return 6
+    else:
+        return 1
+
 def searchByName(connection, name):
     return sql_utils.getRecipesByName(connection, name)
 
@@ -492,6 +518,5 @@ def searchByCourse(connection, course):
 def searchByAuthorName(connection, first_name):
     return sql_utils.getRecipesByAuthorName(connection, first_name)
 
-def searchByDietaryRestriction(connection, restriction):
-    # TODO: check any ingredient.
-    return True
+def searchByDietaryRestriction(connection, recipeId, restriction):
+    return sql_utils.recipeToDR(connection, recipeId, restriction)

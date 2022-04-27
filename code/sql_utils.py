@@ -355,10 +355,10 @@ def getRecipeByDietary(_connection, diet_rest):
 def recipeToDR(_connection, r_id, dr_id):
     try:
         cursor = _connection.cursor()
-        query = "CALL recipeToDR({0}, {1});".format(r_id, dr_id)
+        query = "SELECT recipeToDR({0}, {1});".format(r_id, dr_id)
         cursor.execute(query)
         result = cursor.fetchone()
-        return result
+        return result[0]
     except pymysql.Error as e:
         print('Error: %d: %s' % (e.args[0], e.args[1]))
         return False
