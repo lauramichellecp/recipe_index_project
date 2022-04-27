@@ -1,6 +1,5 @@
 import tkinter as tk
 from tkinter import *
-import tkinter.ttk
 import sql_utils
 
 class UpdateIngredient():

@@ -1,12 +1,8 @@
 import pymysql
-import sys
 
 
 def createRecipe(_connection, r_name, r_prep_time, r_cook_time, r_serving_size,
                  r_cuisine, r_instruct, r_note, r_descrip, current_user, r_course):
-    """
-    Create a new recipe (add arguments needed for procedure call)
-    """
     try:
         cursor = _connection.cursor()
         query = 'CALL createRecipe("{0}", {1}, {2}, {3}, "{4}", "{5}", "{6}", "{7}", {8}, "{9}");' \

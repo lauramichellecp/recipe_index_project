@@ -1,8 +1,6 @@
 import tkinter as tk
 from tkinter import *
-import tkinter.ttk
 import sql_utils
-import pymysql
 
 class AddRecipe():
     def __init__(self, connection, currentUserId):
@@ -181,7 +179,7 @@ class AddRecipe():
         try:
             recipe = sql_utils.getRecipeByName(self.connection, recipe_name)
             recipe_id = recipe[0]
-        except pymysql.Error as e:
+        except:
             return False
         return recipe_id
 

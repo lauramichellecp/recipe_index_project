@@ -1,6 +1,5 @@
 import tkinter as tk
 from tkinter import *
-import pymysql
 import sql_utils
 
 class SignupWindow():

@@ -86,7 +86,7 @@ class LoginWindow():
     def userSignup(self):
         try:
             return signup.SignupWindow(self.connection)
-        except pymysql.Error as e:
+        except:
             return False        
 
     def update_errorLabel(self, msg):
@@ -119,15 +119,17 @@ def makeConnection(username, password, host='localhost', database='recipe_index'
 
     except pymysql.err.OperationalError as e:
         print('Error: %d: %s\n' % (e.args[0], e.args[1]))
-        print('Try again... \n')
-        return None
+        print('Cannot connect to database. Try again... \n')
+        return False
 
 def main():
     if (len(sys.argv) != 3):
         print("Usage:", "python recipe_index.py username password")
         sys.exit(1)
     else:
-        test = LoginWindow(makeConnection(sys.argv[1], sys.argv[2]))
+        connection = makeConnection(sys.argv[1], sys.argv[2])
+        if (connection):
+            LoginWindow(connection)
 
 if __name__ == "__main__":
   main()
