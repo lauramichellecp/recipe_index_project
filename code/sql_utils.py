@@ -264,10 +264,8 @@ def getUser(_connection, email, password):
     try:
         cursor = _connection.cursor()
         query = "SELECT uid, first_name FROM user WHERE email = '{0}' AND password = '{1}';".format(email, password)
-        print(query)
         cursor.execute(query)
         result = cursor.fetchone()
-        print(result)
         if (result == None):
             return False
         return result
@@ -279,7 +277,7 @@ def getUser(_connection, email, password):
 def addIngredient(_connection, r_id, i_name, diet_rest, amt):
     try:
         cursor = _connection.cursor()
-        query = "CALL addIngredients({0}, '{1}', '{2}', '{3}');".format(r_id, i_name, diet_rest, amt)
+        query = "CALL addIngredients({0}, '{1}', {2}, '{3}');".format(r_id, i_name, diet_rest, amt)
         cursor.execute(query)
         return True
 
