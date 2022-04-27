@@ -12,10 +12,10 @@ class UpdateIngredient():
         self.root.title('Update Recipe #{0} Ingredient #{1}'.format(recipeId, ingredientId))
 
         self.frame = Frame(self.root, width=400, height=150)
-        self.frame.place(x=20, y=20)
+        self.frame.pack(expand=True)
 
         update = Label(self.frame, text="Update ingredient amount or remove from recipe:", anchor='w', width=40, font=("bold", 13))
-        update.grid(row=0, column=0, sticky=W, columnspan=4)
+        update.grid(row=0, column=0, sticky=W, columnspan=4, padx=5, pady=5)
 
         ingredient_amount = Label(self.frame, text="Amount", anchor='w', width=20, font=("bold", 10))
         ingredient_amount.grid(row=2, column=0, sticky=W, columnspan=1)

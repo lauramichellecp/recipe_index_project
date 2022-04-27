@@ -64,12 +64,12 @@ class LoggedInSearch():
         label_search =Label(self.root,text="Search for recipes", width=20,font=("bold",14))
         label_search.place(x=765,y=30)
 
-        self.entry_search_name=Entry(self.root, width=85)
-        self.entry_search_name.place(x=960,y=70)
+        self.entry_search_name=Entry(self.root, width=50)
+        self.entry_search_name.place(x=1030,y=70)
 
         buttonSearch = Button(self.root, text='Search recipes', width=20,bg="black",fg='white', 
             command = lambda: self.searchBy(self.entry_search_name.get(), self.search_variable.get(), self.dr_variable.get()))
-        buttonSearch.place(x=800,y=70)
+        buttonSearch.place(x=800,y=65)
 
         OPTIONS = [
         "Name",
@@ -85,7 +85,7 @@ class LoggedInSearch():
 
         search_options = OptionMenu(self.root, self.search_variable, *OPTIONS)
         search_options.place(x=1500,y=65)
-        search_options.configure(width=15)
+        search_options.configure(width=10)
 
         OPTIONS_DR = [
         "-",
@@ -136,11 +136,11 @@ class LoggedInSearch():
 
         buttonAddNewRecipe = Button(self.root, text='Add New Recipe', width=20,bg="black",fg='white', 
             command = lambda: add.AddRecipe(self.connection, currentUser))
-        buttonAddNewRecipe.place(x=1000,y=340)
+        buttonAddNewRecipe.place(x=1050,y=340)
 
         buttonAddBookmark = Button(self.root, text='Add To Bookmarks', width=20,bg="black",fg='white', 
             command = lambda: self.addBookmark(currentUser))
-        buttonAddBookmark.place(x=1200,y=340)
+        buttonAddBookmark.place(x=1300,y=340)
 
         label_more_details =Label(self.root,text="Recipe Details", width=20,font=("bold",14))
         label_more_details.place(x=750,y=400)

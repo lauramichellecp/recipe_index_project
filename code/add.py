@@ -13,15 +13,17 @@ class AddRecipe():
         self.root = Tk()  # Window
         self.root.geometry("900x900")
         self.root.title('Add New Recipe')
-        
+
+        label_recipe =Label(self.root,text="Add New Recipe", anchor='w', width=20,font=("bold",14))
+        label_recipe.pack(side=TOP, ipady=20)
+
         self.frame = Frame(self.root, width=400, height=400)
-        self.frame.place(x=50, y=65)
+        self.frame.pack(expand=True)
 
         self.recipeNo_label = Label(self.frame, text="NOTE: Please create a new recipe before adding ingredients to that recipe", fg="gray", font=('Aerial 10'))
         self.recipeNo_label.grid(row=0, column=0, sticky=W, columnspan=5)
 
-        label_recipe =Label(self.root,text="Add New Recipe", anchor='w', width=20,font=("bold",14))
-        label_recipe.place(x=50, y=20)
+
 
         # Add recipe name
         name_label = Label(self.frame, text="Recipe Name:", anchor='w', width=20, font=("bold", 10))

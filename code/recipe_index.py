@@ -29,14 +29,14 @@ class LoginWindow():
         label_email =Label(frame,text="Email", width=20,font=("bold",10))
         label_email.grid(row=1,column=0, columnspan=1)
 
-        entry_email=Entry(frame, width=25)
+        entry_email=Entry(frame, width=20)
         entry_email.grid(row=1,column=1, columnspan=3)
         #entry_email.insert(0, "")
 
         label_pass =Label(frame,text="Password", width=20,font=("bold",10))
         label_pass.grid(row=2,column=0, columnspan=1)
 
-        entry_password=Entry(frame, show="*", width=25)
+        entry_password=Entry(frame, show="*", width=20)
         entry_password.grid(row=2,column=1, columnspan=3)
         #entry_password.insert(0, "")
 
