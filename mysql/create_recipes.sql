@@ -118,7 +118,7 @@ call recipe_index.addIngredients(5, 'garlic powder', 1, '1/2 tsp');
 call recipe_index.addIngredients(5, 'parmesan', 1, '1/4 cup');
 call recipe_index.addIngredients(5, 'dried oregano', 1, '1 tsp');
 call recipe_index.addIngredients(5, 'salt and pepper', 1, 'one tsp');
-call recipe_index.addIngredients(5, 'redpepper flakes', 1, '1/2 tsp');
+call recipe_index.addIngredients(5, 'red pepper flakes', 1, '1/2 tsp');
 call recipe_index.addIngredients(5, 'marinara sauce', 1, '1 cup');
 call recipe_index.addIngredients(5, 'parsley', 1, 'chopped');
 call recipe_index.addIngredients(5, 'mozzarella', 1, '1 cup');
@@ -132,12 +132,12 @@ CALL recipe_index.createRecipe('Crispy Hash Browns', 15, 20, 4, 'American',
 4. Heat 2 tablespoons canola oil in a 12-inch cast iton skillet over medium heat
 5. Working in batches, spread potatoes in a single layer and cook, undisturbed until golden brown. 
 Flip and cook on the other side unti evenly golden and crispy. 
-6. Serve immediately', 'Serve with ketchup or hot sauce', 'Quick, easy, and SO INCREDIBKY CRISPY!', 
+6. Serve immediately', 'Serve with ketchup or hot sauce', 'Quick, easy, and SO INCREDIBLY CRISPY!', 
 2, 'Breakfast');
 
 call recipe_index.addIngredients(6, 'russet potatoes', 4, '1/4 Ibs');
 call recipe_index.addIngredients(6, 'garlic powder', 4, '1/4 tsp');
 call recipe_index.addIngredients(6, 'onion powder', 4, '1/4 tbsp');
-call recipe_index.addIngredients(6, 'canola oik', 4, '4 Tbsp');
+call recipe_index.addIngredients(6, 'canola oil', 4, '4 Tbsp');
 call recipe_index.addIngredients(6, 'salt and pepper', 4, 'to taste');
 
