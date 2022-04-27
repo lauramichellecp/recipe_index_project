@@ -23,8 +23,6 @@ class AddRecipe():
         self.recipeNo_label = Label(self.frame, text="NOTE: Please create a new recipe before adding ingredients to that recipe", fg="gray", font=('Aerial 10'))
         self.recipeNo_label.grid(row=0, column=0, sticky=W, columnspan=5)
 
-
-
         # Add recipe name
         name_label = Label(self.frame, text="Recipe Name:", anchor='w', width=20, font=("bold", 10))
         name_entry = Entry(self.frame, width=70, font=("bold", 10))
@@ -85,17 +83,11 @@ class AddRecipe():
         diet_restrict = Label(self.frame, text="Please select all applicable dietary restrictions:",
                               anchor='w', width=60, font=("bold", 10))
         diet_restrict.grid(row=21, column=0, sticky=W, columnspan=4)
-        dietary_restrictions = ['Vegetarian', 'Gluten Free', 'Vegetarian', 'Dairy Free', 'Nut Free']
-        dr_lb = Listbox(self.frame, selectmode=MULTIPLE, width=20, height=5)
-        dr_lb.grid(row=22, column=0, sticky=W)
+        dietary_restrictions = ['Vegan', 'Gluten Free', 'Vegetarian', 'Dairy Free', 'Nut Free']
+        self.dr_lb = Listbox(self.frame, selectmode=MULTIPLE, width=20, height=5)
+        self.dr_lb.grid(row=22, column=0, sticky=W)
         for item in dietary_restrictions:
-            dr_lb.insert(END, item)
-
-        dietary = []
-        cur = dr_lb.curselection()
-        for i in cur:
-            op = dr_lb.get(i)
-            dietary.append(op)
+            self.dr_lb.insert(END, item)
 
         # Add recipe button
         add_recipe_button = Button(self.frame, text="Add Recipe", width=20, bg="black", fg="white",
@@ -122,7 +114,7 @@ class AddRecipe():
 
         add_ingredient_button = Button(self.frame, text="Add Ingredient", width=20, bg="black", fg="white",
                                        command=lambda: self.add_ingredient(self.recipe_id, ingredient_name_entry.get(),
-                                                                           ingredient_amount_entry.get(), dietary))
+                                                                           ingredient_amount_entry.get()))
         add_ingredient_button.grid(row=41, column=3, sticky=W)
 
         buffer = Label(self.frame, text="", fg="gray", font=('Aerial 10'))
@@ -160,15 +152,16 @@ class AddRecipe():
                 raise Exception("recipe not created")
         except:
             msg="Could not create recipe. Try again..."
-            print(msg)
             self.update_errorLabel(msg, "red")
 
-    def add_ingredient(self, recipe_id, ingredient_name_entry, ingredient_quantity_entry, dietary):
+    def add_ingredient(self, recipe_id, ingredient_name_entry, ingredient_quantity_entry):
+        dietary = self.addDietaryRestrictions()
         self.update_errorLabel("", "black")
-        if not dietary:
+        if dietary == []:
             successful = sql_utils.addIngredient(self.connection, recipe_id, ingredient_name_entry, 1, ingredient_quantity_entry)
         for i in dietary:
-            successful= sql_utils.addIngredient(self.connection, ingredient_name_entry, i, ingredient_quantity_entry)
+            print(i)
+            successful= sql_utils.addIngredient(self.connection, recipe_id, ingredient_name_entry, i, ingredient_quantity_entry)
         
         if (successful and recipe_id != 0):
             self.update_errorLabel("Ingredient added to recipe #{0}".format(recipe_id), "black")
@@ -176,6 +169,13 @@ class AddRecipe():
             self.update_errorLabel("Couldn't add ingredient to recipe. Have you added your new recipe?".format(recipe_id), "red")
             return False
         return True
+
+    def addDietaryRestrictions(self):
+        dietary = []
+        cur = self.dr_lb.curselection()
+        for i in cur:
+            dietary.append(i + 2) 
+        return dietary
 
     def get_recipe_id(self, recipe_name):
         try:

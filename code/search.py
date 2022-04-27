@@ -90,8 +90,8 @@ class LoggedInSearch():
         OPTIONS_DR = [
         "-",
         "Vegan",
-        "Vegetarian",
         "Gluten Free",
+        "Vegetarian",
         "Dairy Free",
         "Nut Free"
         ] 
@@ -486,9 +486,9 @@ def getRestrictionType(restriction):
         return 1
     elif (restriction == 'Vegan'):
         return 2
-    elif (restriction == 'Vegetarian'):
-        return 3
     elif (restriction == 'Gluten Free'):
+        return 3
+    elif (restriction == 'Vegetarian'):
         return 4
     elif (restriction == 'Dairy Free'):
         return 5
