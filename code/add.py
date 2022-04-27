@@ -11,9 +11,6 @@ class AddRecipe():
         self.currentUserId = currentUserId
         self.recipe_id = 0
 
-        print("Add recipe")
-        print(currentUserId)
-
         # Add GUI sutff and call create recipe procedure
         self.root = Tk()  # Window
         self.root.geometry("900x900")
@@ -143,8 +140,7 @@ class AddRecipe():
         self.recipeInstr_label.grid(row=54, column=0, sticky=W, columnspan=5)
 
         done_btn = Button(self.frame, text="Done ", width=20, bg="black", fg="white",
-                                command=lambda: self.add_ingredient(self.recipe_id, ingredient_name_entry.get(),
-                                                                    ingredient_amount_entry.get(), dietary))
+                                command=lambda: self.root.destroy())
         done_btn.grid(row=54, column=3, sticky=W)
 
 

@@ -3,10 +3,12 @@ from tkinter import *
 import tkinter.ttk
 import sql_utils
 import add
+import update
 
 class LoggedInSearch():
     def __init__(self, connection, currentUser, currentUserName):
         self.connection = connection
+        self.currentUserId = currentUser
 
         # Open Search with Bookmarks, etc.
         self.root = Tk() # Window
@@ -209,9 +211,11 @@ class LoggedInSearch():
 
         self.recipe_tree.bind("<Double-1>", self.doubleClick)
         self.recipe_tree.bind("<Key>", self.searchBy('', 'Name', 1))
+        self.recipe_ingredients_tree.bind("<Double-1>", self.updateIngredients)
 
         self.bookmarks_tree.bind("<Double-1>", self.bookmarkdoubleClick)
         self.bookmarks_tree.bind("<Key>", self.showBookmarks(currentUser))
+
     
     def getRecipe(self, recipe):
         self.recipe_tree.focus(recipe)
@@ -429,23 +433,23 @@ class LoggedInSearch():
             msg="Could not update recipe instructions. Make sure you're selecting a recipe you've authored and try again...".format()
             self.update_errorLabel(msg, "red")
 
-    def updateIngredients(self, currentUserId):
+    def updateIngredients(self, event):
         try:
             # Get selected item to Update
-            selected_item = self.recipe_tree.selection()[0]
-            recipe = self.getRecipe(selected_item)
-            recipeId = recipe[0] # gets the recipeId
+            selected_recipe = self.recipe_tree.selection()[0]
+            recipeId = self.getRecipe(selected_recipe)[0] # gets the recipeId
+            selected_ingredient = self.recipe_ingredients_tree.selection()[0]
+            self.recipe_ingredients_tree.focus(selected_ingredient)
+            ingredient = list(self.recipe_ingredients_tree.item(selected_ingredient).values())[2] 
+            ingredientId = ingredient[0]
             
-            # get the ingredients
-            # Call getRecipeIngredients from recipe_follow table.
-
-            isAuthor = sql_utils.isRecipeAuthor(self.connection, recipeId, currentUserId)
-            if (isAuthor):
-                #sql_utils.updateRecipeIngredients(self.connection, recipeId, ingredient, amount, currentUserId)
+            if (sql_utils.isRecipeAuthor(self.connection, recipeId, self.currentUserId)):
+                updateWindow = update.UpdateIngredient(self.connection, recipeId, ingredientId)
                 msg="Updated recipe: #{0}".format(recipeId)
                 self.update_errorLabel(msg, "black") 
             else:
-                raise Exception('cannot delete')
+                raise Exception('cannot update/delete')
+            
         except:
             msg="Could not update ingredients. Make sure you're selecting a recipe you've authored and try again...".format()
             self.update_errorLabel(msg, "red")
