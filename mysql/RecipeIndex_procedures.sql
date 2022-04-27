@@ -13,7 +13,7 @@ BEGIN
 END$$
 DELIMITER ;
 
-SELECT getRecipeAuthor(1);
+-- SELECT getRecipeAuthor(1);
 
 DELIMITER $$
 DROP FUNCTION IF EXISTS isRecipeAuthor$$
@@ -25,8 +25,8 @@ BEGIN
 END$$
 DELIMITER ;
 
-SELECT isRecipeAuthor(1, 2);
-SELECT isRecipeAuthor(1, 1);
+-- SELECT isRecipeAuthor(1, 2);
+-- SELECT isRecipeAuthor(1, 1);
 
 DELIMITER $$
 DROP PROCEDURE IF EXISTS getRecipesByAuthor$$
@@ -38,21 +38,33 @@ BEGIN
 END$$
 DELIMITER ;
 
-CALL getRecipesByAuthor(2);
-CALL getRecipesByAuthor(1);
+-- CALL getRecipesByAuthor(2);
+-- CALL getRecipesByAuthor(1);
 
--- return recipes of this course name
 DELIMITER $$
 DROP PROCEDURE IF EXISTS getRecipesByAuthorName$$
 
 CREATE PROCEDURE getRecipesByAuthorName(IN a_name VARCHAR(16)) 
 BEGIN
-    CALL getRecipesByAuthor((SELECT uid FROM user WHERE first_name = a_name));
+	DECLARE user_id INT;
+    DECLARE row_not_found BOOL DEFAULT FALSE;
+	DECLARE cur CURSOR FOR 
+		SELECT uid FROM user WHERE first_name = a_name;
+	DECLARE CONTINUE HANDLER FOR NOT FOUND
+			SET row_not_found = TRUE;
+    
+	OPEN cur;
+    
+    WHILE row_not_found = FALSE DO 
+			FETCH cur INTO user_id;
+			CALL getRecipesByAuthor(user_id);
+	END WHILE;
+	CLOSE cur;
 END$$
 DELIMITER ;
 
-CALL getRecipesByAuthorName("Laura");
-CALL getRecipesByAuthorName("Maria");
+-- CALL getRecipesByAuthorName("Laura");
+-- CALL getRecipesByAuthorName("Maria");
 
 DELIMITER $$ 
 DROP PROCEDURE IF EXISTS getRecipeByID $$
@@ -63,7 +75,7 @@ BEGIN
 END$$
 DELIMITER ;
 
-CALL getRecipeByID(1);
+-- CALL getRecipeByID(1);
 
 DELIMITER $$ 
 DROP PROCEDURE IF EXISTS getRecipeByID $$
@@ -75,8 +87,7 @@ BEGIN
 END$$
 DELIMITER ;
 
-CALL getRecipeByID(1);
-
+-- CALL getRecipeByID(1);
 
 -- get recipe by name 
 
@@ -101,7 +112,7 @@ BEGIN
     DECLARE ingredient INT;
 	DECLARE doesFollow BOOL DEFAULT TRUE;
 	DECLARE cur CURSOR FOR 
-		SELECT iid FROM recipe_ingredient WHERE rid = recipe_id; -- returns all ingredients in the recipe
+		SELECT iid FROM recipe_ingredient WHERE rid = recipe_id; 
 	DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 	OPEN cur;
     
@@ -117,10 +128,12 @@ BEGIN
 END$$
 DELIMITER ;
 
+/*
 SELECT recipeToDR(1, 1); 
 SELECT recipeToDR(1, 2);
 SELECT recipeToDR(2, 1);
 SELECT recipeToDR(2, 2);
+*/
 
 DELIMITER $$ 
 DROP PROCEDURE IF EXISTS getRecipeByDietary $$
@@ -132,8 +145,8 @@ BEGIN
 END$$
 DELIMITER ;
 
-CALL getRecipeByDietary(1); 
-CALL getRecipeByDietary(3); 
+-- CALL getRecipeByDietary(1); 
+-- CALL getRecipeByDietary(3); 
 
 -- return recipes of this course 
 DELIMITER $$
@@ -146,8 +159,8 @@ BEGIN
 END$$
 DELIMITER ;
 
-CALL getRecipesByCourse(1);
-CALL getRecipesByCourse(2);
+-- CALL getRecipesByCourse(1);
+-- CALL getRecipesByCourse(2);
 
 -- return recipes of this course name
 DELIMITER $$
@@ -159,8 +172,8 @@ BEGIN
 END$$
 DELIMITER ;
 
-CALL getRecipesByCourseName("dessert");
-CALL getRecipesByCourseName("breakfast");
+-- CALL getRecipesByCourseName("dessert");
+-- CALL getRecipesByCourseName("breakfast");
 
 -- return recipes with a prep time less than the given
 DELIMITER $$
@@ -173,8 +186,7 @@ BEGIN
 END$$
 DELIMITER ;
 
-CALL getRecipesByPrepTime(100);
-CALL getRecipesByPrepTime(10);
+-- CALL getRecipesByPrepTime(10);
 
 -- return recipes with a cook time less than the given
 DELIMITER $$
@@ -285,25 +297,20 @@ BEGIN
 END $$
 DELIMITER ;
 
+/*
 CALL createRecipe('No-Bake Chocolate Strawberry Coconut Bars', 20, 10, 8, 'American',
 				'Line a 8x8 pan with a parchment paper with extra parchment hanging over the sides.',
 				'something',
 				'This delicious triple-layered chocolate strawberry coconut bar is no-bake, only uses 6 ingredients',
 				1,
 				'Breakfast');
-
-SELECT * FROM recipe;
-
-SELECT * FROM ingredient;
-SELECT * FROM ingredient_follows;
-SELECT * FROM recipe_ingredient;
-
+*/
 
 DELIMITER $$
 DROP PROCEDURE IF EXISTS addIngredients$$
 
 CREATE PROCEDURE addIngredients(recipe_id INT, 
-								ingredient VARCHAR(16),
+								ingredient VARCHAR(32),
                                 diet_rest INT,
                                 amt VARCHAR(16))
 BEGIN 
@@ -344,13 +351,8 @@ BEGIN
 END$$
 DELIMITER ;
 
-CALL addIngredients(1, 'salt and pepper', 1, 'a pinch');
-CALL addIngredients(1, 'salt and pepper', 2, 'a pinch'); 
-CALL addIngredients(1, 'ingredient', 1, '1 ts');
-CALL addIngredients(1, 'new ingredient', NULL, 'amt');
-SELECT * FROM ingredient;
-SELECT * FROM recipe_ingredient;
-SELECT * FROM ingredient_follows;
+-- CALL addIngredients(1, 'salt and pepper', 1, 'a pinch');
+
 
 -- create a user 
 DELIMITER $$
@@ -381,9 +383,7 @@ BEGIN
 END$$
 DELIMITER ;
 
-CALL createUser('first1', 'last1', 'email@something.com1', 'pass1');
-
-SELECT * FROM user;
+-- CALL createUser('first1', 'last1', 'email@something.com1', 'pass1');
 
 -- create bookmark for a user 
 
@@ -411,9 +411,8 @@ BEGIN
 END $$
 DELIMITER ;
 
-CALL createBookmark(1, 2);
-CALL getBookmarksByUser(2);
-CALL getBookmarksByUser(1);
+-- CALL createBookmark(1, 2);
+-- CALL getBookmarksByUser(2);
 
 -- trigger to delete the ingredient to recipe links
 DELIMITER $$
@@ -436,49 +435,3 @@ CREATE TRIGGER bookmarks_trigger
     DELETE FROM bookmark
     WHERE recipe = old.rid;
   END$$
-
-/**
-CREATE READ UPDATE DETELE
-
-CREATE
-- recipe *
-	- new ingredients on those recipes *
-- new users *
-	- new bookmarks for a user *
-
-READ
-- recipes *
-- bookmarked recipes *
-
-FILTER ON
-- prep time *
-- cook time *
-- total time *
-- dietary rest *
-- course *
-- recipe name *
-
-UPDATE 
-- authors can update their own recipes -- isRecipeAuthor can be used to test
-- all users can update their own bookmarks
-
-DELETE 
-- authors can delete their own recipes
-- all users can delete their own bookmarks
-
-
-Put all these in a sql_utils.py file.
-**/
-
-/**
-TO DO:
-
-1). Provide integrity constraints such as action to be performed for foreign keys  
-ON DELETE, ON UPDATE clauses within the foreign keys in the tables. 
-Also provide additional constraints on fields that are not part of the key
--- when we delete a recipe - create a trigger that updates the recipe ingredient table
-
-2). Add starter values to tables and test calling the procedures
-
-3). add more procedures and triggers
-**/
