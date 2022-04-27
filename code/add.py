@@ -143,7 +143,6 @@ class AddRecipe():
             if (sql_utils.createRecipe(self.connection, recipe_name, prep_time, cook_time, serving_size,
                                    cuisine, instructions, notes, description, author, course)):
                 self.recipe_id = self.get_recipe_id(recipe_name)
-                print(self.recipe_id)
                 # if recipe id is none
                 if self.recipe_id == None or not self.recipe_id:
                     raise Exception("recipe not created")
@@ -160,7 +159,6 @@ class AddRecipe():
         if dietary == []:
             successful = sql_utils.addIngredient(self.connection, recipe_id, ingredient_name_entry, 1, ingredient_quantity_entry)
         for i in dietary:
-            print(i)
             successful= sql_utils.addIngredient(self.connection, recipe_id, ingredient_name_entry, i, ingredient_quantity_entry)
         
         if (successful and recipe_id != 0):
