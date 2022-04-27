@@ -10,13 +10,12 @@ class SignupWindow():
         #Providing title to the form
         self.root = Tk() # Window
 
-
-        self.root.geometry("500x500")
+        self.root.geometry("500x350")
         self.root.title('Sign Up')
 
         #creating a frame for the form
         frame = Frame(self.root, width=300, height=350)
-        frame.pack(expand=True)
+        frame.pack()
 
         label_0 =Label(frame,text="Signup", width=20,font=("bold",18))
         label_0.grid(row=0,column=0,padx=20,pady=20, columnspan=2, sticky=N)

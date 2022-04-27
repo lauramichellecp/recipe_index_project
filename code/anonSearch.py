@@ -5,7 +5,6 @@ import sql_utils
 
 class AnonSearch():
     def __init__(self, connection):
-        self.loggedIn = False
         self.connection = connection
 
         # Open Search without Bookmarks, etc.
@@ -105,7 +104,7 @@ class AnonSearch():
         label_ingredients.grid(row=0,column=0, sticky=W, pady=10)
 
         self.ingredients_frame = Frame(ingredients, width=200, height=400)
-        self.ingredients_frame.grid(row=1,column=0, sticky=N, pady=10)
+        self.ingredients_frame.grid(row=1,column=0, padx=20, sticky=N, pady=10)
 
         recipe_ingredients_columns = ('id', 'name', 'amount')
         self.recipe_ingredients_tree = tkinter.ttk.Treeview(self.ingredients_frame,
@@ -125,9 +124,7 @@ class AnonSearch():
         instructions_frame.pack(side=LEFT, expand=True)
         ingredients.pack(side=RIGHT, expand=True)
 
-
-    def loggedIn(self):
-        return self.loggedIn
+        self.recipe_tree.bind("<Key>", self.searchBy('', 'Name', 1))
 
     def getRecipe(self, recipe):
         self.recipe_tree.focus(recipe)
@@ -169,6 +166,28 @@ class AnonSearch():
         except:
             msg="Could not search by the given filter. Try again.."
             self.update_errorLabel(msg)
+    
+    def getIngredients(self):
+        recipe = self.getRecipe(self.recipe_tree.selection()[0])
+        recipeId = recipe[0] # get the recipeId from the selection
+        result = sql_utils.getIngredients(self.connection, recipeId)
+        all_ingredients = []
+        try:
+            for tuple in result:
+                item = (str(tuple[0]), str(tuple[2]), str(tuple[1]))
+                # append ingredients to total recipes
+                all_ingredients.append(item)
+            self.createIngredientEntries(all_ingredients)
+        except:
+            msg="Could not show recipe ingredients. Try again.."
+            self.update_errorLabel(msg, "red")
+
+    def createIngredientEntries(self, ingredients):
+        for item in self.recipe_ingredients_tree.get_children():
+            self.recipe_ingredients_tree.delete(item)     
+        for r in ingredients:
+            self.recipe_ingredients_tree.insert('', tk.END, values=r)
+            self.recipe_ingredients_tree.pack()
 
     def clearItems(self):
         # Get selected item to Delete
@@ -178,7 +197,6 @@ class AnonSearch():
     def createEntries(self, recipes):
         # Delete entries that are already in the tree!
         self.recipe_tree.delete()
-        rows = []
         for r in recipes:
             self.recipe_tree.insert('', tk.END, values=r)
             self.recipe_tree.pack()
@@ -189,6 +207,7 @@ class AnonSearch():
             recipe = self.getRecipe(self.recipe_tree.selection()[0])
             recipeInstructions = recipe[9]
             self.instructions_text.insert(1.0, recipeInstructions)
+            self.getIngredients()
         except:
             return False
 

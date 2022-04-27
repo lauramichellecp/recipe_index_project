@@ -104,7 +104,6 @@ class LoggedInSearch():
         self.frame.place(x=800, y=100)
 
         self.recipe_tree = tkinter.ttk.Treeview(self.frame, columns=recipe_columns, show="headings")
-        # command= lambda: self.searchBy('', 'Name', '-')
         self.recipe_tree.heading('id', text='ID', anchor='center')
         self.recipe_tree.column("id", stretch=NO, width=50)
         self.recipe_tree.heading('name', text='Recipe Name', anchor='center')

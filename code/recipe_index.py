@@ -16,28 +16,28 @@ class LoginWindow():
 
         #Providing title to the form
         self.root = Tk() # Window
-        self.root.geometry("500x500")
+        self.root.geometry("500x350")
         self.root.title('Welcome to Recipe Index!')
 
         #creating a frame for the form
         frame = Frame(self.root, width=300, height=350)
-        frame.pack(expand=True)
+        frame.pack()
 
         login_label =Label(frame, text="Login", width=20,font=("bold",20))
         login_label.grid(row=0,column=0, columnspan=2, padx=20, pady=20, sticky=N)
 
         label_email =Label(frame,text="Email", width=20,font=("bold",10))
-        label_email.grid(row=1,column=0)
+        label_email.grid(row=1,column=0, columnspan=1)
 
-        entry_email=Entry(frame, width=10)
-        entry_email.grid(row=1,column=1)
+        entry_email=Entry(frame, width=25)
+        entry_email.grid(row=1,column=1, columnspan=3)
         #entry_email.insert(0, "")
 
         label_pass =Label(frame,text="Password", width=20,font=("bold",10))
-        label_pass.grid(row=2,column=0)
+        label_pass.grid(row=2,column=0, columnspan=1)
 
-        entry_password=Entry(frame, show="*", width=10)
-        entry_password.grid(row=2,column=1)
+        entry_password=Entry(frame, show="*", width=25)
+        entry_password.grid(row=2,column=1, columnspan=3)
         #entry_password.insert(0, "")
 
         buttonLoggedIn = Button(frame, text='Login', width=10,bg="black",fg='white',
@@ -56,27 +56,24 @@ class LoginWindow():
             command = lambda: self.openSearch())
         buttonSearch.grid(row=7,column=0, columnspan=2,padx=5, pady=5, sticky=N)
 
-        self.errorLabel()
-
-        #self.root.attributes('-topmost',True)
+        self.label= Label(frame, text="", font=('Aerial 10'))
+        self.label.grid(row=9, column=0, columnspan=2,padx=5, pady=5, sticky=N)
 
         self.root.mainloop()
     
     def userLogin(self, email, password):
         try:
             user = sql_utils.getUser(self.connection, email, password)
-            self.currentActiveUser = user[0]
-            self.currentActiveUserName = user[1]
-            print(self.currentActiveUser)
-            # something weird here, I think...
+            self.currentActiveUser = user[0] # get user id
+            self.currentActiveUserName = user[1] # get user first name
             if (self.currentActiveUser):
                 self.loggedIn = True
                 self.update_errorLabel("")
                 self.openSearch()
             else:
                 self.update_errorLabel("Couldn't log in! Try again...")
-        except pymysql.Error as e:
-            return False
+        except:
+            self.update_errorLabel("Couldn't log in! Try again...")
         return True
 
     def userLogout(self):
@@ -90,21 +87,11 @@ class LoginWindow():
         try:
             return signup.signUpScreen(self.connection)
         except pymysql.Error as e:
-            return False
-
-    def errorLabel(self):
-        global label
-        label=Label(self.root, text="", font=('Aerial 10'))
-        label.place(y=330)
-
-    def remove_errorLabel(self):
-        global label
-        label.pack_forget()
+            return False        
 
     def update_errorLabel(self, msg):
-        global label
         try:
-            label["text"]=msg
+            self.label["text"]=msg
         except:
             return False
 

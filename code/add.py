@@ -128,7 +128,24 @@ class AddRecipe():
                                                                            ingredient_amount_entry.get(), dietary))
         add_ingredient_button.grid(row=41, column=3, sticky=W)
 
-        self.errorLabel(43)
+        buffer = Label(self.frame, text="", fg="gray", font=('Aerial 10'))
+        buffer.grid(row=42, column=0, sticky=W, columnspan=5, rowspan=3)
+        
+        self.errorLabel(46)
+
+        buffer = Label(self.frame, text="", fg="gray", font=('Aerial 10'))
+        buffer.grid(row=47, column=0, sticky=W, columnspan=5, rowspan=3)
+        buffer = Label(self.frame, text="", fg="gray", font=('Aerial 10'))
+        buffer.grid(row=51, column=0, sticky=W, columnspan=5, rowspan=3)
+
+        self.recipeInstr_label = Label(self.frame, text="Done adding ingredients to recipe? Click Done to close the window", 
+            fg="gray", font=('Aerial 10'))
+        self.recipeInstr_label.grid(row=54, column=0, sticky=W, columnspan=5)
+
+        done_btn = Button(self.frame, text="Done ", width=20, bg="black", fg="white",
+                                command=lambda: self.add_ingredient(self.recipe_id, ingredient_name_entry.get(),
+                                                                    ingredient_amount_entry.get(), dietary))
+        done_btn.grid(row=54, column=3, sticky=W)
 
 
     def add_recipe(self, recipe_name, prep_time, cook_time, serving_size, cuisine, instructions, notes,
@@ -157,10 +174,10 @@ class AddRecipe():
         for i in dietary:
             successful= sql_utils.addIngredient(self.connection, ingredient_name_entry, i, ingredient_quantity_entry)
         
-        self.update_errorLabel("Ingredient added to recipe #{0}".format(recipe_id), "black")
-
-        if (not successful):
-            self.update_errorLabel("Couldn't add ingredient to recipe #{0}".format(recipe_id), "red")
+        if (successful and recipe_id != 0):
+            self.update_errorLabel("Ingredient added to recipe #{0}".format(recipe_id), "black")
+        elif (not successful or recipe_id == 0):
+            self.update_errorLabel("Couldn't add ingredient to recipe. Have you added your new recipe?".format(recipe_id), "red")
             return False
         return True
 
