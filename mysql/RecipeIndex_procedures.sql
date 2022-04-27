@@ -310,7 +310,7 @@ DELIMITER $$
 DROP PROCEDURE IF EXISTS addIngredients$$
 
 CREATE PROCEDURE addIngredients(recipe_id INT, 
-								ingredient VARCHAR(16),
+								ingredient VARCHAR(32),
                                 diet_rest INT,
                                 amt VARCHAR(16))
 BEGIN 
